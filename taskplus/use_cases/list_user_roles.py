@@ -1,11 +1,12 @@
 from taskplus.shared.response import ResponseSuccess
+from taskplus.shared.use_case import UseCase
 
 
-class ListUserRoles(object):
+class ListUserRoles(UseCase):
 
     def __init__(self, repo):
         self.repo = repo
 
-    def execute(self, request):
-        roles = self.repo.list()
+    def process_request(self, request):
+        roles = self.repo.list(filters=request.filters)
         return ResponseSuccess(roles)

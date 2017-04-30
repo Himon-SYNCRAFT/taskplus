@@ -47,5 +47,5 @@ def test_list_user_roles_request_invalid_filters():
     request = ListUserRolesRequest.from_dict({'filters': 5})
 
     assert request.has_errors()
-    assert request._errors[0].parameter == 'filters'
+    assert request.errors[0].parameter == 'filters'
     assert bool(request) is False

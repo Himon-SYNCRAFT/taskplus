@@ -7,14 +7,14 @@ RequestError = namedtuple('RequestError', ['parameter', 'message'])
 class InvalidRequest(object):
 
     def __init__(self):
-        self._errors = []
+        self.errors = []
 
     def add_error(self, parameter, message):
         error = RequestError(parameter=parameter, message=message)
-        self._errors.append(error)
+        self.errors.append(error)
 
     def has_errors(self):
-        return len(self._errors) > 0
+        return len(self.errors) > 0
 
     def __nonzero__(self):
         return False
