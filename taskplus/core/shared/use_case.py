@@ -1,4 +1,4 @@
-from taskplus.shared.response import ResponseFailure
+from taskplus.core.shared.response import ResponseFailure
 
 
 class UseCase(object):

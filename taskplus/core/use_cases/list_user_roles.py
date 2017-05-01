@@ -1,5 +1,5 @@
-from taskplus.shared.response import ResponseSuccess
-from taskplus.shared.use_case import UseCase
+from taskplus.core.shared.response import ResponseSuccess
+from taskplus.core.shared.use_case import UseCase
 
 
 class ListUserRoles(UseCase):

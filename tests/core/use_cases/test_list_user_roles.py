@@ -1,10 +1,10 @@
 import pytest
 from unittest import mock
 
-from taskplus.domain.user_role import UserRole
-from taskplus.use_cases.list_user_roles import ListUserRoles
-from taskplus.use_cases.list_user_roles_request import ListUserRolesRequest
-from taskplus.shared.response import ResponseFailure
+from taskplus.core.domain.user_role import UserRole
+from taskplus.core.use_cases.list_user_roles import ListUserRoles
+from taskplus.core.use_cases.list_user_roles_request import ListUserRolesRequest
+from taskplus.core.shared.response import ResponseFailure
 
 
 @pytest.fixture

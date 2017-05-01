@@ -1,5 +1,5 @@
 from collections import Mapping
-from taskplus.shared.request import ValidRequest, InvalidRequest
+from taskplus.core.shared.request import ValidRequest, InvalidRequest
 
 
 class ListUserRolesRequest(ValidRequest):

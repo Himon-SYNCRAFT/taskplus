@@ -1,6 +1,6 @@
 import pytest
-from taskplus.shared.response import ResponseSuccess, ResponseFailure
-from taskplus.shared.request import InvalidRequest
+from taskplus.core.shared.response import ResponseSuccess, ResponseFailure
+from taskplus.core.shared.request import InvalidRequest
 
 
 @pytest.fixture

@@ -1,4 +1,4 @@
-from taskplus.shared.domain_model import DomainModel
+from taskplus.core.shared.domain_model import DomainModel
 
 
 class UserRole(object):

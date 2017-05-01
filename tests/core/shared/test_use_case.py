@@ -1,8 +1,8 @@
 from unittest import mock
 
-from taskplus.shared.request import InvalidRequest
-from taskplus.shared.response import ResponseFailure
-from taskplus.shared.use_case import UseCase
+from taskplus.core.shared.request import InvalidRequest
+from taskplus.core.shared.response import ResponseFailure
+from taskplus.core.shared.use_case import UseCase
 
 
 def test_use_case_cannot_process_valid_requests():

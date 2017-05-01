@@ -1,4 +1,4 @@
-from taskplus.domain.user_role import UserRole
+from taskplus.core.domain.user_role import UserRole
 
 
 role_name = 'admin'

@@ -1,4 +1,4 @@
-from taskplus.use_cases.list_user_roles_request import ListUserRolesRequest
+from taskplus.core.use_cases.list_user_roles_request import ListUserRolesRequest
 
 
 def test_list_user_roles_request_without_parameters():

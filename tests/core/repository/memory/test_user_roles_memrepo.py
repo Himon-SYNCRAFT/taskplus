@@ -1,7 +1,7 @@
 import pytest
 
-from taskplus.shared.domain_model import DomainModel
-from taskplus.repository.memory.user_roles_memrepo import UserRolesRepo
+from taskplus.core.shared.domain_model import DomainModel
+from taskplus.core.repository.memory.user_roles_memrepo import UserRolesRepo
 
 
 role1 = dict(name='admin')
