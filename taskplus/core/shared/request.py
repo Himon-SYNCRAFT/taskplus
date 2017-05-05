@@ -4,31 +4,22 @@ from collections import namedtuple
 RequestError = namedtuple('RequestError', ['parameter', 'message'])
 
 
-class InvalidRequest(object):
+class Request(object):
 
     def __init__(self):
         self.errors = []
 
-    def add_error(self, parameter, message):
+    def _add_error(self, parameter, message):
         error = RequestError(parameter=parameter, message=message)
         self.errors.append(error)
 
-    def has_errors(self):
-        return len(self.errors) > 0
+    def is_valid(self):
+        self._validate()
+        return len(self.errors) == 0
 
-    def __nonzero__(self):
-        return False
-
-    __bool__ = __nonzero__
-
-
-class ValidRequest(object):
+    def _validate(self):
+        raise NotImplementedError
 
     @classmethod
     def from_dict(cls, data):
         raise NotImplementedError
-
-    def __nonzero__(self):
-        return True
-
-    __bool__ = __nonzero__

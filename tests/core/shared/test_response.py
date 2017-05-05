@@ -1,6 +1,7 @@
 import pytest
+from unittest import mock
 from taskplus.core.shared.response import ResponseSuccess, ResponseFailure
-from taskplus.core.shared.request import InvalidRequest
+from taskplus.core.shared.request import RequestError
 
 
 @pytest.fixture
@@ -53,20 +54,27 @@ def test_response_failure_initialization_with_exception():
 
 
 def test_response_failure_from_invalid_request():
-    response = ResponseFailure.build_from_invalid_request(InvalidRequest())
+    request = mock.Mock()
+    request.errors = []
+    request.is_valid.return_value = False
+
+    response = ResponseFailure.build_from_invalid_request(request)
     assert bool(response) is False
 
 
 def test_response_failure_from_invalid_request_with_errors():
-    request = InvalidRequest()
-    request.add_error('path', 'Is mandatory')
-    request.add_error('path', "can't be blank")
+    request = mock.Mock()
+    request.errors = [
+        RequestError('path', 'is mandatory'),
+        RequestError('path', "can't be blank"),
+    ]
+    request.is_valid.return_value = False
 
     response = ResponseFailure.build_from_invalid_request(request)
 
     assert bool(response) is False
     assert response.type == ResponseFailure.PARAMETER_ERROR
-    assert response.message == "path: Is mandatory\npath: can't be blank"
+    assert response.message == "path: is mandatory\npath: can't be blank"
 
 
 def test_response_failure_build_resource_error():

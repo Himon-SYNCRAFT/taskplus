@@ -1,6 +1,6 @@
 from unittest import mock
 
-from taskplus.core.shared.request import InvalidRequest
+from taskplus.core.shared.request import RequestError
 from taskplus.core.shared.response import ResponseFailure
 from taskplus.core.shared.use_case import UseCase
 
@@ -20,10 +20,12 @@ def test_use_case_cannot_process_valid_requests():
 
 
 def test_use_case_can_process_invalid_requests_and_returns_response_failure():
-    request = InvalidRequest()
     parameter = 'parameter'
     message = 'message'
-    request.add_error(parameter, message)
+
+    request = mock.Mock()
+    request.is_valid.return_value = False
+    request.errors = [RequestError(parameter, message)]
 
     use_case = UseCase()
     response = use_case.execute(request)
@@ -40,9 +42,12 @@ def test_use_case_can_manage_generic_exception_process_request():
     class TestException(Exception):
         pass
 
+    request = mock.Mock()
+    request.is_valid.return_value = True
+
     use_case.process_request = mock.Mock()
     use_case.process_request.side_effect = TestException(error_message)
-    response = use_case.execute(mock.Mock)
+    response = use_case.execute(request)
 
     assert not response
     assert response.type == ResponseFailure.SYSTEM_ERROR

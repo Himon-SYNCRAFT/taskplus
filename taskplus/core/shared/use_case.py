@@ -4,7 +4,7 @@ from taskplus.core.shared.response import ResponseFailure
 class UseCase(object):
 
     def execute(self, request):
-        if not request:
+        if not request.is_valid():
             return ResponseFailure.build_from_invalid_request(request)
 
         try:

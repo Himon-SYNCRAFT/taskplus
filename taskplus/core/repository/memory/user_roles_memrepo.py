@@ -25,10 +25,10 @@ class UserRolesRepo(object):
         if not filters:
             return self._entries
 
-        result = []
-        result.extend(self._entries)
+        entries = []
+        entries.extend(self._entries)
 
         for key, value in filters.items():
-            result = [e for e in result if self._check(e, key, value)]
+            entries = [e for e in entries if self._check(e, key, value)]
 
-        return [UserRole.from_dict(item) for item in result]
+        return [UserRole.from_dict(item) for item in entries]

@@ -4,49 +4,42 @@ from taskplus.core.use_cases.list_user_roles_request import\
 
 def test_list_user_roles_request_without_parameters():
     request = ListUserRolesRequest()
+    print(request.errors)
 
     assert request.filters is None
-    assert bool(request) is True
+    assert request.is_valid() is True
 
 
 def test_list_user_roles_request_from_empty_dict():
     request = ListUserRolesRequest.from_dict({})
 
     assert request.filters is None
-    assert bool(request) is True
+    assert request.is_valid() is True
 
 
 def test_list_user_roles_request_with_empty_filters():
     request = ListUserRolesRequest(filters={})
 
-    assert request.filters == {}
-    assert bool(request) is True
+    assert request.filters is None
+    assert request.is_valid() is True
 
 
 def test_list_user_roles_request_from_dict_with_empty_filters():
-    request = ListUserRolesRequest.from_dict({'filters': {}})
+    request = ListUserRolesRequest.from_dict({})
 
-    assert request.filters == {}
-    assert bool(request) is True
+    assert request.filters is None
+    assert request.is_valid() is True
 
 
 def test_list_user_roles_request_with_filters():
     request = ListUserRolesRequest(filters={'a': 1, 'b': 2})
 
     assert request.filters == {'a': 1, 'b': 2}
-    assert bool(request) is True
-
-
-def test_list_user_roles_request_from_dict_with_filters():
-    request = ListUserRolesRequest.from_dict({'filters': {'a': 1, 'b': 2}})
-
-    assert request.filters == {'a': 1, 'b': 2}
-    assert bool(request) is True
+    assert request.is_valid() is True
 
 
 def test_list_user_roles_request_invalid_filters():
-    request = ListUserRolesRequest.from_dict({'filters': 5})
+    request = ListUserRolesRequest.from_dict(5)
 
-    assert request.has_errors()
+    assert request.is_valid() is False
     assert request.errors[0].parameter == 'filters'
-    assert bool(request) is False

@@ -1,25 +1,31 @@
 from collections import Mapping
-from taskplus.core.shared.request import ValidRequest, InvalidRequest
+from taskplus.core.shared.request import Request
 
 
-class ListUserRolesRequest(ValidRequest):
+class ListUserRolesRequest(Request):
 
     def __init__(self, filters=None):
+        super().__init__()
+
+        if not filters:
+            filters = None
+
         self.filters = filters
+        self._validate()
 
     @classmethod
     def from_dict(cls, data):
-        invalid_request = InvalidRequest()
+        if not data:
+            data = None
+        return ListUserRolesRequest(filters=data)
 
-        if 'filters' in data and not isinstance(data['filters'], Mapping):
+    def _validate(self):
+        self.errors = []
+
+        if self.filters is None:
+            return
+
+        if not isinstance(self.filters, Mapping):
             parameter = 'filters'
             message = 'Is not iterable'
-            invalid_request.add_error(parameter, message)
-
-        if invalid_request.has_errors():
-            return invalid_request
-
-        return ListUserRolesRequest(filters=data.get('filters', None))
-
-    def __nonzero__(self):
-        return True
+            self._add_error(parameter, message)

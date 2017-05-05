@@ -36,7 +36,7 @@ def test_list_roles_with_parameters(roles):
     role_name = 'creator'
     filters = dict(name=role_name)
 
-    request = ListUserRolesRequest.from_dict({'filters': filters})
+    request = ListUserRolesRequest.from_dict(filters)
     use_case = ListUserRoles(repo)
 
     response = use_case.execute(request)
@@ -66,7 +66,7 @@ def test_list_roles_handles_generic_error():
 def test_list_roles_handles_bad_request():
     repo = mock.Mock()
 
-    request = ListUserRolesRequest.from_dict({'filters': 5})
+    request = ListUserRolesRequest.from_dict(5)
     use_case = ListUserRoles(repo)
 
     response = use_case.execute(request)
