@@ -19,7 +19,3 @@ class Request(object):
 
     def _validate(self):
         raise NotImplementedError
-
-    @classmethod
-    def from_dict(cls, data):
-        raise NotImplementedError

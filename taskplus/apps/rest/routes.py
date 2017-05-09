@@ -12,7 +12,7 @@ blueprint = Blueprint('rest', __name__)
 
 @blueprint.route('/roles', methods=['GET'])
 def get_all_user_roles():
-    request = ListUserRolesRequest.from_dict({})
+    request = ListUserRolesRequest()
     repo = UserRolesRepo()
     use_case = ListUserRoles(repo)
     response = use_case.execute(request)

@@ -10,22 +10,8 @@ def test_list_user_roles_request_without_parameters():
     assert request.is_valid() is True
 
 
-def test_list_user_roles_request_from_empty_dict():
-    request = ListUserRolesRequest.from_dict({})
-
-    assert request.filters is None
-    assert request.is_valid() is True
-
-
 def test_list_user_roles_request_with_empty_filters():
     request = ListUserRolesRequest(filters={})
-
-    assert request.filters is None
-    assert request.is_valid() is True
-
-
-def test_list_user_roles_request_from_dict_with_empty_filters():
-    request = ListUserRolesRequest.from_dict({})
 
     assert request.filters is None
     assert request.is_valid() is True
@@ -39,7 +25,7 @@ def test_list_user_roles_request_with_filters():
 
 
 def test_list_user_roles_request_invalid_filters():
-    request = ListUserRolesRequest.from_dict(5)
+    request = ListUserRolesRequest(filters=5)
 
     assert request.is_valid() is False
     assert request.errors[0].parameter == 'filters'

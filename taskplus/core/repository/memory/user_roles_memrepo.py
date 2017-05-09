@@ -8,7 +8,7 @@ class UserRolesRepo(object):
         if entries:
             self._entries.extend(entries)
 
-    def _check(self, element, key, value):
+    def _check_operator(self, element, key, value):
         if '__' not in key:
             key = key + '__eq'
 
@@ -29,6 +29,6 @@ class UserRolesRepo(object):
         entries.extend(self._entries)
 
         for key, value in filters.items():
-            entries = [e for e in entries if self._check(e, key, value)]
+            entries = [e for e in entries if self._check_operator(e, key, value)]
 
-        return [UserRole.from_dict(item) for item in entries]
+        return [UserRole(**item) for item in entries]

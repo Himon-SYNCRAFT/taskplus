@@ -1,19 +1,28 @@
+import pytest
 from taskplus.core.use_cases.add_user_role_request import AddUserRoleRequest
 
 
 new_role_name = 'admin'
 
 
-def test_add_valid_user_role():
+def test_add_user_role_request_init():
     request = AddUserRoleRequest(name=new_role_name)
 
     assert request.name == new_role_name
-    assert bool(request) is True
+    assert request.is_valid() is True
 
 
-def test_add_valid_user_role_from_dict():
-    data = dict(name=new_role_name)
-    request = AddUserRoleRequest.from_dict(data)
+def test_add_user_role_request_without_data():
+    with pytest.raises(Exception):
+        AddUserRoleRequest()
 
-    assert request.name == new_role_name
-    assert bool(request) is True
+
+def test_add_user_role_request_invalid_data():
+    request = AddUserRoleRequest(name=5)
+
+    assert request.name == 5
+    assert request.is_valid() is False
+    assert any(
+        [e.parameter == 'name' and e.message == 'expected string, got int(5)'
+            for e in request.errors]
+    )

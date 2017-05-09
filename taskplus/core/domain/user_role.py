@@ -3,13 +3,9 @@ from taskplus.core.shared.domain_model import DomainModel
 
 class UserRole(object):
 
-    def __init__(self, name):
+    def __init__(self, name, id=None):
         self.name = name
-
-    @classmethod
-    def from_dict(cls, data):
-        role = UserRole(name=data['name'])
-        return role
+        self.id = id
 
 
 DomainModel.register(UserRole)

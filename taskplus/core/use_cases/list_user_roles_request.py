@@ -13,12 +13,6 @@ class ListUserRolesRequest(Request):
         self.filters = filters
         self._validate()
 
-    @classmethod
-    def from_dict(cls, data):
-        if not data:
-            data = None
-        return ListUserRolesRequest(filters=data)
-
     def _validate(self):
         self.errors = []
 
