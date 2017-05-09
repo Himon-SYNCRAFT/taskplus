@@ -1,7 +1,7 @@
 from taskplus.core.shared.response import ResponseFailure
 
 
-class UseCase(object):
+class Action(object):
 
     def execute(self, request):
         if not request.is_valid():
@@ -16,4 +16,4 @@ class UseCase(object):
 
     def process_request(self, request):
         raise NotImplementedError(
-            'process_request() not implemented by UseCase class')
+            'process_request() not implemented by Action class')

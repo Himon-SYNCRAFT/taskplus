@@ -1,5 +1,5 @@
 import pytest
-from taskplus.core.use_cases.add_user_role_request import AddUserRoleRequest
+from taskplus.core.actions import AddUserRoleRequest
 
 
 new_role_name = 'admin'

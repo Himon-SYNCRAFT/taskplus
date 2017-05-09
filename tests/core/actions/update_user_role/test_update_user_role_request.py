@@ -1,6 +1,6 @@
 import pytest
 
-from taskplus.core.use_cases.update_user_role_request import UpdateUserRoleRequest
+from taskplus.core.actions import UpdateUserRoleRequest
 
 
 def test_update_user_role_request():

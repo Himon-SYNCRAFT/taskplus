@@ -2,9 +2,8 @@ import pytest
 from unittest import mock
 
 from taskplus.core.domain.user_role import UserRole
-from taskplus.core.use_cases.list_user_roles import ListUserRoles
-from taskplus.core.use_cases.list_user_roles_request import\
-    ListUserRolesRequest
+from taskplus.core.actions import ListUserRolesAction
+from taskplus.core.actions import ListUserRolesRequest
 from taskplus.core.shared.response import ResponseFailure
 
 
@@ -21,9 +20,9 @@ def test_list_roles_without_parameters(roles):
     repo.list.return_value = roles
 
     request = ListUserRolesRequest()
-    use_case = ListUserRoles(repo)
+    action = ListUserRolesAction(repo)
 
-    response = use_case.execute(request)
+    response = action.execute(request)
 
     assert bool(response) is True
     repo.list.assert_called_with(filters=None)
@@ -37,9 +36,9 @@ def test_list_roles_with_parameters(roles):
     filters = dict(name=role_name)
 
     request = ListUserRolesRequest(filters)
-    use_case = ListUserRoles(repo)
+    action = ListUserRolesAction(repo)
 
-    response = use_case.execute(request)
+    response = action.execute(request)
 
     assert bool(response) is True
     repo.list.assert_called_with(filters=filters)
@@ -52,9 +51,9 @@ def test_list_roles_handles_generic_error():
     repo.list.side_effect = Exception(error_message)
 
     request = ListUserRolesRequest()
-    use_case = ListUserRoles(repo)
+    action = ListUserRolesAction(repo)
 
-    response = use_case.execute(request)
+    response = action.execute(request)
 
     assert bool(response) is False
     assert response.value == {
@@ -67,9 +66,9 @@ def test_list_roles_handles_bad_request():
     repo = mock.Mock()
 
     request = ListUserRolesRequest(5)
-    use_case = ListUserRoles(repo)
+    action = ListUserRolesAction(repo)
 
-    response = use_case.execute(request)
+    response = action.execute(request)
 
     assert bool(response) is False
     assert response.value == {

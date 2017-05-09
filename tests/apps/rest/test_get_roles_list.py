@@ -10,10 +10,10 @@ role = UserRole(name=role_name)
 roles = [role]
 
 
-@mock.patch('taskplus.apps.rest.routes.ListUserRoles')
-def test_get(mock_use_case, client):
+@mock.patch('taskplus.apps.rest.routes.ListUserRolesAction')
+def test_get(mock_action, client):
     response = ResponseSuccess(roles)
-    mock_use_case().execute.return_value = response
+    mock_action().execute.return_value = response
 
     http_response = client.get('/roles')
 

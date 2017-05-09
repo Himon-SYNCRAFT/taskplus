@@ -1,8 +1,8 @@
 from taskplus.core.shared.response import ResponseSuccess
-from taskplus.core.shared.use_case import UseCase
+from taskplus.core.shared.action import Action
 
 
-class UpdateUserRole(UseCase):
+class UpdateUserRoleAction(Action):
 
     def __init__(self, repo):
         self.repo = repo

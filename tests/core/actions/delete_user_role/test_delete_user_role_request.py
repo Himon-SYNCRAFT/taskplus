@@ -1,4 +1,4 @@
-from taskplus.core.use_cases.delete_user_role_request import DeleteUserRoleRequest
+from taskplus.core.actions import DeleteUserRoleRequest
 
 
 def test_delete_user_role_request():

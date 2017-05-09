@@ -1,8 +1,8 @@
-from taskplus.core.shared.use_case import UseCase
+from taskplus.core.shared.action import Action
 from taskplus.core.shared.response import ResponseSuccess
 
 
-class DeleteUserRole(UseCase):
+class DeleteUserRoleAction(Action):
 
     def __init__(self, repo):
         self.repo = repo

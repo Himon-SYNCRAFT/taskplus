@@ -1,7 +1,7 @@
 from unittest import mock
 
-from taskplus.core.use_cases.add_user_role import AddUserRole
-from taskplus.core.use_cases.add_user_role_request import AddUserRoleRequest
+from taskplus.core.actions import AddUserRoleAction
+from taskplus.core.actions import AddUserRoleRequest
 
 
 def test_add_user_role():
@@ -9,8 +9,8 @@ def test_add_user_role():
     repo = mock.Mock()
     request = AddUserRoleRequest(name=role_name)
 
-    use_case = AddUserRole(repo=repo)
-    response = use_case.execute(request)
+    action = AddUserRoleAction(repo=repo)
+    response = action.execute(request)
 
     assert bool(response) is True
     repo.save.assert_called_once()
