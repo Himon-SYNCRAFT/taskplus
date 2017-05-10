@@ -24,6 +24,7 @@ def test_update_user_role_handles_bad_request():
     response = action.execute(request)
 
     assert bool(response) is False
+    assert not repo.update.called
     assert response.value == {
         'type': ResponseFailure.PARAMETER_ERROR,
         'message': 'id: is required\nname: expected string, got list([])'
@@ -40,6 +41,7 @@ def test_update_user_handle_generic_error():
     response = action.execute(request)
 
     assert bool(response) is False
+    repo.update.assert_called_once()
     assert response.value == {
         'type': ResponseFailure.SYSTEM_ERROR,
         'message': 'Exception: {}'.format(error_message)
