@@ -1,8 +1,7 @@
 from unittest import mock
 
 from taskplus.core.actions import AddUserAction, AddUserRequest
-from taskplus.core.domain.user import User
-from taskplus.core.domain.user_role import UserRole
+from taskplus.core.domain import User, UserRole
 from taskplus.core.shared.response import ResponseFailure
 
 

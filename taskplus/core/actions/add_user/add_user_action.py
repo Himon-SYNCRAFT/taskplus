@@ -1,4 +1,4 @@
-from taskplus.core.domain.user import User
+from taskplus.core.domain import User
 from taskplus.core.shared.action import Action
 from taskplus.core.shared.response import ResponseSuccess
 

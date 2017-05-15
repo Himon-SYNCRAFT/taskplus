@@ -2,7 +2,7 @@ from unittest import mock
 import pytest
 
 from taskplus.core.actions import ListUsersAction, ListUsersRequest
-from taskplus.core.domain.user import User
+from taskplus.core.domain import User
 from taskplus.core.shared.response import ResponseFailure
 
 

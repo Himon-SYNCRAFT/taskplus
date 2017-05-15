@@ -2,7 +2,7 @@ import json
 from unittest import mock
 
 from taskplus.core.shared.response import ResponseSuccess
-from taskplus.core.domain.user_role import UserRole
+from taskplus.core.domain import UserRole
 
 
 role_name = 'admin'

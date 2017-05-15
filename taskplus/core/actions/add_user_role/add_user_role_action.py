@@ -1,5 +1,5 @@
+from taskplus.core.domain import UserRole
 from taskplus.core.shared.action import Action
-from taskplus.core.domain.user_role import UserRole
 from taskplus.core.shared.response import ResponseSuccess
 
 

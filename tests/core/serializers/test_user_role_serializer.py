@@ -1,7 +1,7 @@
 import json
 
+from taskplus.core.domain import UserRole
 from taskplus.core.serializers.user_role_serializer import UserRoleEncoder
-from taskplus.core.domain.user_role import UserRole
 
 
 def test_serialize_role():
