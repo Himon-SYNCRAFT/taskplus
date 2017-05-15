@@ -37,3 +37,8 @@ from taskplus.core.actions.delete_user.delete_user_action\
      import DeleteUserAction
 from taskplus.core.actions.delete_user.delete_user_request\
      import DeleteUserRequest
+
+from taskplus.core.actions.cancel_task.cancel_task_action\
+     import CancelTaskAction
+from taskplus.core.actions.cancel_task.cancel_task_request\
+     import CancelTaskRequest
