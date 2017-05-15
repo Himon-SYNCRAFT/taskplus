@@ -1,0 +1,16 @@
+from taskplus.core.actions.add_user_role.add_user_role_action\
+     import AddUserRoleAction
+from taskplus.core.actions.add_user_role.add_user_role_request\
+     import AddUserRoleRequest
+from taskplus.core.actions.delete_user_role.delete_user_role_action\
+     import DeleteUserRoleAction
+from taskplus.core.actions.delete_user_role.delete_user_role_request\
+     import DeleteUserRoleRequest
+from taskplus.core.actions.list_user_roles.list_user_roles_action\
+     import ListUserRolesAction
+from taskplus.core.actions.list_user_roles.list_user_roles_request\
+     import ListUserRolesRequest
+from taskplus.core.actions.update_user_role.update_user_role_action\
+     import UpdateUserRoleAction
+from taskplus.core.actions.update_user_role.update_user_role_request\
+     import UpdateUserRoleRequest

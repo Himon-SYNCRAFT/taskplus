@@ -1,0 +1,314 @@
+.
+├── actions
+│   ├── add_task
+│   │   └── __init__.py
+│   ├── add_user
+│   │   ├── __init__.py
+│   │   ├── __pycache__
+│   │   │   ├── __init__.cpython-36.pyc
+│   │   │   ├── test_add_user_action.cpython-36-PYTEST.pyc
+│   │   │   └── test_add_user_request.cpython-36-PYTEST.pyc
+│   │   ├── test_add_user_action.py
+│   │   └── test_add_user_request.py
+│   ├── add_user_role
+│   │   ├── __init__.py
+│   │   ├── __pycache__
+│   │   │   ├── __init__.cpython-36.pyc
+│   │   │   ├── test_add_user_role.cpython-36-PYTEST.pyc
+│   │   │   └── test_add_user_role_request.cpython-36-PYTEST.pyc
+│   │   ├── test_add_user_role.py
+│   │   └── test_add_user_role_request.py
+│   ├── assign_user_to_task
+│   │   ├── __init__.py
+│   │   ├── __pycache__
+│   │   │   ├── __init__.cpython-36.pyc
+│   │   │   └── test_assing_user_to_task_request.cpython-36-PYTEST.pyc
+│   │   └── test_assing_user_to_task_request.py
+│   ├── cancel_task
+│   │   ├── __init__.py
+│   │   ├── __pycache__
+│   │   │   ├── __init__.cpython-36.pyc
+│   │   │   ├── test_cancel_task_action.cpython-36-PYTEST.pyc
+│   │   │   └── test_cancel_task_request.cpython-36-PYTEST.pyc
+│   │   ├── test_cancel_task_action.py
+│   │   └── test_cancel_task_request.py
+│   ├── complete_task
+│   │   ├── complete_task_action.py
+│   │   ├── __init__.py
+│   │   ├── __pycache__
+│   │   │   ├── __init__.cpython-36.pyc
+│   │   │   └── test_complete_task_request.cpython-36-PYTEST.pyc
+│   │   └── test_complete_task_request.py
+│   ├── delete_user
+│   │   ├── __init__.py
+│   │   ├── __pycache__
+│   │   │   ├── __init__.cpython-36.pyc
+│   │   │   ├── test_delete_user_action.cpython-36-PYTEST.pyc
+│   │   │   └── test_delete_user_request.cpython-36-PYTEST.pyc
+│   │   ├── test_delete_user_action.py
+│   │   └── test_delete_user_request.py
+│   ├── delete_user_role
+│   │   ├── __init__.py
+│   │   ├── __pycache__
+│   │   │   ├── __init__.cpython-36.pyc
+│   │   │   ├── test_delete_user_role.cpython-36-PYTEST.pyc
+│   │   │   └── test_delete_user_role_request.cpython-36-PYTEST.pyc
+│   │   ├── test_delete_user_role.py
+│   │   └── test_delete_user_role_request.py
+│   ├── get_role_details
+│   │   └── __init__.py
+│   ├── get_task_details
+│   │   └── __init__.py
+│   ├── get_task_status_details
+│   │   └── __init__.py
+│   ├── get_user_details
+│   │   └── __init__.py
+│   ├── __init__.py
+│   ├── list_user_roles
+│   │   ├── __init__.py
+│   │   ├── __pycache__
+│   │   │   ├── __init__.cpython-36.pyc
+│   │   │   ├── test_list_user_roles.cpython-36-PYTEST.pyc
+│   │   │   └── test_list_user_roles_request.cpython-36-PYTEST.pyc
+│   │   ├── test_list_user_roles.py
+│   │   └── test_list_user_roles_request.py
+│   ├── list_users
+│   │   ├── __init__.py
+│   │   ├── __pycache__
+│   │   │   ├── __init__.cpython-36.pyc
+│   │   │   ├── test_list_users.cpython-36-PYTEST.pyc
+│   │   │   └── test_list_users_request.cpython-36-PYTEST.pyc
+│   │   ├── test_list_users.py
+│   │   └── test_list_users_request.py
+│   ├── __pycache__
+│   │   ├── __init__.cpython-36.pyc
+│   │   ├── test_add_user_role.cpython-36-PYTEST.pyc
+│   │   ├── test_add_user_role_request.cpython-36-PYTEST.pyc
+│   │   ├── test_delete_user_role.cpython-36-PYTEST.pyc
+│   │   ├── test_delete_user_role_request.cpython-36-PYTEST.pyc
+│   │   ├── test_list_user_roles.cpython-36-PYTEST.pyc
+│   │   ├── test_list_user_roles_request.cpython-36-PYTEST.pyc
+│   │   ├── test_update_user_role.cpython-36-PYTEST.pyc
+│   │   ├── test_update_user_role_request.cpython-36-PYTEST.pyc
+│   │   ├── test_user_role_list.cpython-36-PYTEST.pyc
+│   │   └── test_user_role_list_request.cpython-36-PYTEST.pyc
+│   ├── show_not_completed_tasks
+│   │   └── __init__.py
+│   ├── unnasign_user_from_task
+│   │   └── __init__.py
+│   ├── update_user
+│   │   ├── __init__.py
+│   │   ├── __pycache__
+│   │   │   ├── __init__.cpython-36.pyc
+│   │   │   ├── test_update_user_action.cpython-36-PYTEST.pyc
+│   │   │   └── test_update_user_request.cpython-36-PYTEST.pyc
+│   │   ├── test_update_user_action.py
+│   │   └── test_update_user_request.py
+│   └── update_user_role
+│       ├── __init__.py
+│       ├── __pycache__
+│       │   ├── __init__.cpython-36.pyc
+│       │   ├── test_update_user_role.cpython-36-PYTEST.pyc
+│       │   └── test_update_user_role_request.cpython-36-PYTEST.pyc
+│       ├── test_update_user_role.py
+│       └── test_update_user_role_request.py
+├── domain
+│   ├── __init__.py
+│   ├── __pycache__
+│   │   ├── __init__.cpython-36.pyc
+│   │   ├── test_task.cpython-36-PYTEST.pyc
+│   │   ├── test_task_status.cpython-36-PYTEST.pyc
+│   │   ├── test_user.cpython-36-PYTEST.pyc
+│   │   └── test_userrole.cpython-36-PYTEST.pyc
+│   ├── test_task.py
+│   ├── test_task_status.py
+│   ├── test_user.py
+│   └── test_userrole.py
+├── __init__.py
+├── less
+├── __pycache__
+│   └── __init__.cpython-36.pyc
+├── repository
+│   ├── __init__.py
+│   ├── memory
+│   │   ├── __init__.py
+│   │   ├── __pycache__
+│   │   │   ├── __init__.cpython-36.pyc
+│   │   │   └── test_user_roles_memrepo.cpython-36-PYTEST.pyc
+│   │   └── test_user_roles_memrepo.py
+│   └── __pycache__
+│       └── __init__.cpython-36.pyc
+├── serializers
+│   ├── __init__.py
+│   ├── __pycache__
+│   │   ├── __init__.cpython-36.pyc
+│   │   └── test_user_role_serializer.cpython-36-PYTEST.pyc
+│   └── test_user_role_serializer.py
+└── shared
+    ├── __init__.py
+    ├── __pycache__
+    │   ├── __init__.cpython-36.pyc
+    │   ├── test_action.cpython-36-PYTEST.pyc
+    │   ├── test_response.cpython-36-PYTEST.pyc
+    │   └── test_use_case.cpython-36-PYTEST.pyc
+    ├── test_action.py
+    └── test_response.py
+
+42 directories, 112 files
+.
+├── actions
+│   ├── add_task
+│   │   └── __init__.py
+│   ├── add_user
+│   │   ├── __init__.py
+│   │   ├── __pycache__
+│   │   │   ├── __init__.cpython-36.pyc
+│   │   │   ├── test_add_user_action.cpython-36-PYTEST.pyc
+│   │   │   └── test_add_user_request.cpython-36-PYTEST.pyc
+│   │   ├── test_add_user_action.py
+│   │   └── test_add_user_request.py
+│   ├── add_user_role
+│   │   ├── __init__.py
+│   │   ├── __pycache__
+│   │   │   ├── __init__.cpython-36.pyc
+│   │   │   ├── test_add_user_role.cpython-36-PYTEST.pyc
+│   │   │   └── test_add_user_role_request.cpython-36-PYTEST.pyc
+│   │   ├── test_add_user_role.py
+│   │   └── test_add_user_role_request.py
+│   ├── assign_user_to_task
+│   │   ├── __init__.py
+│   │   ├── __pycache__
+│   │   │   ├── __init__.cpython-36.pyc
+│   │   │   └── test_assing_user_to_task_request.cpython-36-PYTEST.pyc
+│   │   └── test_assing_user_to_task_request.py
+│   ├── cancel_task
+│   │   ├── __init__.py
+│   │   ├── __pycache__
+│   │   │   ├── __init__.cpython-36.pyc
+│   │   │   ├── test_cancel_task_action.cpython-36-PYTEST.pyc
+│   │   │   └── test_cancel_task_request.cpython-36-PYTEST.pyc
+│   │   ├── test_cancel_task_action.py
+│   │   └── test_cancel_task_request.py
+│   ├── complete_task
+│   │   ├── complete_task_action.py
+│   │   ├── __init__.py
+│   │   ├── __pycache__
+│   │   │   ├── __init__.cpython-36.pyc
+│   │   │   └── test_complete_task_request.cpython-36-PYTEST.pyc
+│   │   └── test_complete_task_request.py
+│   ├── delete_user
+│   │   ├── __init__.py
+│   │   ├── __pycache__
+│   │   │   ├── __init__.cpython-36.pyc
+│   │   │   ├── test_delete_user_action.cpython-36-PYTEST.pyc
+│   │   │   └── test_delete_user_request.cpython-36-PYTEST.pyc
+│   │   ├── test_delete_user_action.py
+│   │   └── test_delete_user_request.py
+│   ├── delete_user_role
+│   │   ├── __init__.py
+│   │   ├── __pycache__
+│   │   │   ├── __init__.cpython-36.pyc
+│   │   │   ├── test_delete_user_role.cpython-36-PYTEST.pyc
+│   │   │   └── test_delete_user_role_request.cpython-36-PYTEST.pyc
+│   │   ├── test_delete_user_role.py
+│   │   └── test_delete_user_role_request.py
+│   ├── get_role_details
+│   │   └── __init__.py
+│   ├── get_task_details
+│   │   └── __init__.py
+│   ├── get_task_status_details
+│   │   └── __init__.py
+│   ├── get_user_details
+│   │   └── __init__.py
+│   ├── __init__.py
+│   ├── list_user_roles
+│   │   ├── __init__.py
+│   │   ├── __pycache__
+│   │   │   ├── __init__.cpython-36.pyc
+│   │   │   ├── test_list_user_roles.cpython-36-PYTEST.pyc
+│   │   │   └── test_list_user_roles_request.cpython-36-PYTEST.pyc
+│   │   ├── test_list_user_roles.py
+│   │   └── test_list_user_roles_request.py
+│   ├── list_users
+│   │   ├── __init__.py
+│   │   ├── __pycache__
+│   │   │   ├── __init__.cpython-36.pyc
+│   │   │   ├── test_list_users.cpython-36-PYTEST.pyc
+│   │   │   └── test_list_users_request.cpython-36-PYTEST.pyc
+│   │   ├── test_list_users.py
+│   │   └── test_list_users_request.py
+│   ├── __pycache__
+│   │   ├── __init__.cpython-36.pyc
+│   │   ├── test_add_user_role.cpython-36-PYTEST.pyc
+│   │   ├── test_add_user_role_request.cpython-36-PYTEST.pyc
+│   │   ├── test_delete_user_role.cpython-36-PYTEST.pyc
+│   │   ├── test_delete_user_role_request.cpython-36-PYTEST.pyc
+│   │   ├── test_list_user_roles.cpython-36-PYTEST.pyc
+│   │   ├── test_list_user_roles_request.cpython-36-PYTEST.pyc
+│   │   ├── test_update_user_role.cpython-36-PYTEST.pyc
+│   │   ├── test_update_user_role_request.cpython-36-PYTEST.pyc
+│   │   ├── test_user_role_list.cpython-36-PYTEST.pyc
+│   │   └── test_user_role_list_request.cpython-36-PYTEST.pyc
+│   ├── show_not_completed_tasks
+│   │   └── __init__.py
+│   ├── unnasign_user_from_task
+│   │   └── __init__.py
+│   ├── update_user
+│   │   ├── __init__.py
+│   │   ├── __pycache__
+│   │   │   ├── __init__.cpython-36.pyc
+│   │   │   ├── test_update_user_action.cpython-36-PYTEST.pyc
+│   │   │   └── test_update_user_request.cpython-36-PYTEST.pyc
+│   │   ├── test_update_user_action.py
+│   │   └── test_update_user_request.py
+│   └── update_user_role
+│       ├── __init__.py
+│       ├── __pycache__
+│       │   ├── __init__.cpython-36.pyc
+│       │   ├── test_update_user_role.cpython-36-PYTEST.pyc
+│       │   └── test_update_user_role_request.cpython-36-PYTEST.pyc
+│       ├── test_update_user_role.py
+│       └── test_update_user_role_request.py
+├── domain
+│   ├── __init__.py
+│   ├── __pycache__
+│   │   ├── __init__.cpython-36.pyc
+│   │   ├── test_task.cpython-36-PYTEST.pyc
+│   │   ├── test_task_status.cpython-36-PYTEST.pyc
+│   │   ├── test_user.cpython-36-PYTEST.pyc
+│   │   └── test_userrole.cpython-36-PYTEST.pyc
+│   ├── test_task.py
+│   ├── test_task_status.py
+│   ├── test_user.py
+│   └── test_userrole.py
+├── __init__.py
+├── less
+├── __pycache__
+│   └── __init__.cpython-36.pyc
+├── repository
+│   ├── __init__.py
+│   ├── memory
+│   │   ├── __init__.py
+│   │   ├── __pycache__
+│   │   │   ├── __init__.cpython-36.pyc
+│   │   │   └── test_user_roles_memrepo.cpython-36-PYTEST.pyc
+│   │   └── test_user_roles_memrepo.py
+│   └── __pycache__
+│       └── __init__.cpython-36.pyc
+├── serializers
+│   ├── __init__.py
+│   ├── __pycache__
+│   │   ├── __init__.cpython-36.pyc
+│   │   └── test_user_role_serializer.cpython-36-PYTEST.pyc
+│   └── test_user_role_serializer.py
+└── shared
+    ├── __init__.py
+    ├── __pycache__
+    │   ├── __init__.cpython-36.pyc
+    │   ├── test_action.cpython-36-PYTEST.pyc
+    │   ├── test_response.cpython-36-PYTEST.pyc
+    │   └── test_use_case.cpython-36-PYTEST.pyc
+    ├── test_action.py
+    └── test_response.py
+
+42 directories, 112 files

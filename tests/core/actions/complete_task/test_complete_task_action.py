@@ -36,7 +36,7 @@ def test_complete_task_action_handles_bad_request():
 
 def test_complete_task_action_handles_generic_error():
     error_message = 'Error!!!'
-    task_id = None
+    task_id = 1
     task_repo = mock.Mock()
     task_repo.update.side_effect = Exception(error_message)
     status_repo = mock.Mock()
