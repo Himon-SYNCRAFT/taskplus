@@ -42,3 +42,8 @@ from taskplus.core.actions.cancel_task.cancel_task_action\
      import CancelTaskAction
 from taskplus.core.actions.cancel_task.cancel_task_request\
      import CancelTaskRequest
+
+# from taskplus.core.actions.complete_task.complete_task_action\
+#      import CompleteTaskAction
+from taskplus.core.actions.complete_task.complete_task_request\
+     import CompleteTaskRequest
