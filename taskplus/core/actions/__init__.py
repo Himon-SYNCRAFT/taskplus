@@ -62,3 +62,13 @@ from taskplus.core.actions.get_user_details.get_user_details_action\
      import GetUserDetailsAction
 from taskplus.core.actions.get_user_details.get_user_details_request\
      import GetUserDetailsRequest
+
+from taskplus.core.actions.get_role_details.get_role_details_action\
+     import GetRoleDetailsAction
+from taskplus.core.actions.get_role_details.get_role_details_request\
+     import GetRoleDetailsRequest
+
+from taskplus.core.actions.get_task_details.get_task_details_action\
+     import GetTaskDetailsAction
+from taskplus.core.actions.get_task_details.get_task_details_request\
+     import GetTaskDetailsRequest
