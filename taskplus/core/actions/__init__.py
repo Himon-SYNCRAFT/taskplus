@@ -52,3 +52,13 @@ from taskplus.core.actions.assign_user_to_task.assign_user_to_task_action\
      import AssignUserToTaskAction
 from taskplus.core.actions.assign_user_to_task.assign_user_to_task_request\
      import AssignUserToTaskRequest
+
+from taskplus.core.actions.unassign_user_from_task.unassign_user_from_task_action\
+     import UnassignUserFromTaskAction
+from taskplus.core.actions.unassign_user_from_task.unassign_user_from_task_request\
+     import UnassignUserFromTaskRequest
+
+from taskplus.core.actions.get_user_details.get_user_details_action\
+     import GetUserDetailsAction
+from taskplus.core.actions.get_user_details.get_user_details_request\
+     import GetUserDetailsRequest
