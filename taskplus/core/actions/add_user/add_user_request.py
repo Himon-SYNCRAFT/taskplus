@@ -12,7 +12,9 @@ class AddUserRequest(Request):
     def _validate(self):
         self.errors = []
 
-        if not self.name:
+        if self.name is None:
+            self._add_error('name', 'is required')
+        elif isinstance(self.name, str) and not self.name.strip():
             self._add_error('name', 'is required')
         elif not isinstance(self.name, str):
             message = 'expected str, got {}({})'.format(
