@@ -1,12 +1,23 @@
+import os
 from sqlalchemy import event, create_engine
 from sqlalchemy.engine import Engine
-from sqlalchemy.orm import scoped_session, sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import scoped_session, sessionmaker
 
 from taskplus.core.domain import Statuses
+from taskplus.apps.rest.settings import ProdConfig, DevConfig, TestConfig
 
 
-engine = create_engine('sqlite:///data.db', echo=True, convert_unicode=True)
+if os.environ.get('TESTING'):
+    config = TestConfig
+elif os.environ.get('PRODUCTION'):
+    config = ProdConfig
+else:
+    config = DevConfig
+
+db_uri = config.DB_URI
+
+engine = create_engine(db_uri, echo=False, convert_unicode=True)
 db_session = scoped_session(sessionmaker(autocommit=False, autoflush=True,
                                          bind=engine))
 Base = declarative_base()
@@ -14,6 +25,7 @@ Base.query = db_session.query_property()
 
 
 def create_db():
+    # turn on foreign keys
     if db_session.bind.driver == 'pysqlite':
         @event.listens_for(Engine, "connect")
         def set_sqlite_pragma(dbapi_connection, connection_record):
@@ -26,15 +38,15 @@ def create_db():
     Base.metadata.drop_all(engine)
     Base.metadata.create_all(engine)
 
-    creator_role = models.UserRole(name='creator')
-    doer_role = models.UserRole(name='doer')
+    creator_role = models.UserRole(name='creator_role')
+    doer_role = models.UserRole(name='doer_role')
 
     db_session.add(creator_role)
     db_session.add(doer_role)
     db_session.commit()
 
-    creator = models.User(name='creator_1', role_id=creator_role.id)
-    doer = models.User(name='doer_1', role_id=doer_role.id)
+    creator = models.User(name='creator', role_id=creator_role.id)
+    doer = models.User(name='doer', role_id=doer_role.id)
 
     db_session.add(creator)
     db_session.add(doer)

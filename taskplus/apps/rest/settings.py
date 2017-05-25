@@ -6,8 +6,7 @@ class Config(object):
 
     APP_DIR = os.path.abspath(os.path.dirname(__file__))  # This directory
     PROJECT_ROOT = os.path.abspath(os.path.join(APP_DIR, os.pardir))
-    print(APP_DIR)
-    print(PROJECT_ROOT)
+    DB_URI = 'sqlite:///data.db'
 
 
 class ProdConfig(Config):
@@ -27,3 +26,4 @@ class TestConfig(Config):
     ENV = 'test'
     TESTING = True
     DEBUG = True
+    DB_URI = 'sqlite:///test.db'

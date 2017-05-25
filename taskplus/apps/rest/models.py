@@ -20,7 +20,8 @@ class Task(Base):
     id = Column(Integer, primary_key=True)
     name = Column(String)
     content = Column(String)
-    status_id = Column(Integer, ForeignKey('task_statuses.id'))
+    status_id = Column(Integer,
+                       ForeignKey('task_statuses.id'))
     creator_id = Column(Integer, ForeignKey('users.id'))
     doer_id = Column(Integer, ForeignKey('users.id'))
 

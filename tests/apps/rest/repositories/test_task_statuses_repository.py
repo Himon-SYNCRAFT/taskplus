@@ -1,119 +1,183 @@
-import pytest
-from unittest import mock
+from sqlalchemy import event
+from sqlalchemy.engine import Engine
 
+from taskplus.apps.rest.database import Base, db_session, engine
 from taskplus.apps.rest.repositories import TaskStatusesRepository
+from taskplus.core.domain import Statuses
 from taskplus.core.domain import TaskStatus
 from taskplus.core.shared.domain_model import DomainModel
 
 
-@pytest.fixture
-def status():
-    status = mock.Mock()
-    status.id = 1
-    status.name = 'new'
-    return status
+def setup_function():
+    if db_session.bind.driver == 'pysqlite':
+        @event.listens_for(Engine, "connect")
+        def set_sqlite_pragma(dbapi_connection, connection_record):
+            cursor = dbapi_connection.cursor()
+            cursor.execute("PRAGMA foreign_keys=ON")
+            cursor.close()
+
+    from taskplus.apps.rest import models
+    Base.metadata.drop_all(engine)
+    Base.metadata.create_all(engine)
+
+    status_new = models.TaskStatus(id=Statuses.NEW.value, name='new')
+    status_in_progress = models.TaskStatus(id=Statuses.IN_PROGRESS.value,
+                                           name='in progress')
+    status_completed = models.TaskStatus(id=Statuses.COMPLETED.value,
+                                         name='completed')
+    status_canceled = models.TaskStatus(id=Statuses.CANCELED.value, name='canceled')
+
+    db_session.add(status_new)
+    db_session.add(status_in_progress)
+    db_session.add(status_canceled)
+    db_session.add(status_completed)
+    db_session.commit()
 
 
-@pytest.fixture
-def statuses():
-    status_new = mock.Mock()
-    status_new.id = 1
-    status_new.name = 'new'
-
-    status_done = mock.Mock()
-    status_done.id = 2
-    status_done.name = 'done'
-
-    return [status_new, status_done]
-
-
-def test_statuses_repository_one(status):
+def test_statuses_repository_one():
+    id = Statuses.NEW.value
     repository = TaskStatusesRepository()
-    repository.status_model = mock.Mock()
-    repository.status_model.query.get.return_value = status
-    result = repository.one(1)
+    result = repository.one(id)
 
     assert isinstance(result, DomainModel)
-    assert result.id == status.id
-    assert result.name == status.name
+    assert result.id == id
+    assert result.name == 'new'
 
 
-def test_statuses_repository_one_non_existing_status(status):
+def test_statuses_repository_one_non_existing_status():
     repository = TaskStatusesRepository()
-    repository.status_model = mock.Mock()
-    repository.status_model.query.get.return_value = None
-    result = repository.one(1)
+    result = repository.one(99)
 
     assert result is None
 
 
-def test_statuses_repository_list(statuses):
+def test_statuses_repository_list():
     repository = TaskStatusesRepository()
-    repository.status_model = mock.Mock()
-    repository.status_model.query.all.return_value = statuses
     result = repository.list()
 
     for i, status in enumerate(result):
         assert isinstance(status, DomainModel)
-        assert status.id == statuses[i].id
-        assert status.name == statuses[i].name
+
+    assert len(result) == 4
 
 
-def test_statuses_repository_list_with_filters(status):
+def test_statuses_repository_list_with_filters():
     filters = {
         'name': 'new'
     }
 
     repository = TaskStatusesRepository()
-    repository.status_model = mock.Mock()
-    repository.status_model.query.all.return_value = [status]
-    repository.status_model.query.filter().all.return_value = [status]
     result = repository.list(filters)[0]
 
-    repository.status_model.query.filter.assert_called()
     assert isinstance(result, DomainModel)
-    assert result.id == status.id
-    assert result.name == status.name
+    assert result.name == 'new'
+
+
+def test_statuses_repository_with_filter_gt():
+    filters = {
+        'id__gt': 1
+    }
+
+    repository = TaskStatusesRepository()
+    result = repository.list(filters)
+
+    for i, status in enumerate(result):
+        assert isinstance(status, DomainModel)
+        assert status.id != 1
+
+    assert len(result) == 3
+
+
+def test_statuses_repository_with_filter_lt():
+    filters = {
+        'id__lt': 4
+    }
+
+    repository = TaskStatusesRepository()
+    result = repository.list(filters)
+
+    for i, status in enumerate(result):
+        assert isinstance(status, DomainModel)
+        assert status.id != 4
+
+    assert len(result) == 3
+
+
+def test_statuses_repository_with_filter_ne():
+    filters = {
+        'id__ne': 2
+    }
+
+    repository = TaskStatusesRepository()
+    result = repository.list(filters)
+
+    for i, status in enumerate(result):
+        assert isinstance(status, DomainModel)
+        assert status.id != 2
+
+    assert len(result) == 3
+
+
+def test_statuses_repository_with_filter_ge():
+    filters = {
+        'id__ge': 2
+    }
+
+    repository = TaskStatusesRepository()
+    result = repository.list(filters)
+
+    for i, status in enumerate(result):
+        assert isinstance(status, DomainModel)
+        assert status.id != 1
+
+    assert any([status.id == 2 for status in result])
+    assert len(result) == 3
+
+
+def test_statuses_repository_with_filter_le():
+    filters = {
+        'id__le': 2
+    }
+
+    repository = TaskStatusesRepository()
+    result = repository.list(filters)
+
+    for i, status in enumerate(result):
+        assert isinstance(status, DomainModel)
+
+    assert any([status.id == 1 for status in result])
+    assert any([status.id == 2 for status in result])
+    assert len(result) == 2
 
 
 def test_statuses_repository_update():
-    repository = TaskStatusesRepository()
-    repository.status_model = mock.Mock()
-    repository.session = mock.Mock()
-    result = repository.update(TaskStatus(id=1, name='canceled'))
+    id = 1
+    name = 'suspended'
 
-    repository.session.add.assert_called_once()
-    repository.session.commit.assert_called_once()
+    repository = TaskStatusesRepository()
+    result = repository.update(TaskStatus(id=id, name=name))
+
     assert isinstance(result, DomainModel)
+    assert result.id == id
+    assert result.name == name
 
 
 def test_statuses_repository_save():
+    status_name = 'suspended'
     repository = TaskStatusesRepository()
-    repository.status_model = mock.Mock()
-    repository.session = mock.Mock()
-    result = repository.save(TaskStatus(name='canceled'))
+    result = repository.save(TaskStatus(name=status_name))
 
-    repository.session.add.assert_called_once()
-    repository.session.commit.assert_called_once()
     assert isinstance(result, DomainModel)
+    assert result.name == status_name
 
 
-def test_statuses_repository_work_on_real_db(status):
+def test_statuses_repository_delete():
+    id = Statuses.NEW.value
     repository = TaskStatusesRepository()
+    result = repository.delete(id)
+    statuses = repository.list()
 
-    filters = {
-        'name': 'new'
-    }
-
-    result = repository.list(filters)[0]
     assert isinstance(result, DomainModel)
-
-    filters = {
-        'id__lt': 2
-    }
-
-    result = repository.list(filters)
-    assert isinstance(result[0], DomainModel)
-
-    result = repository.one(1)
-    assert isinstance(result, DomainModel)
+    assert result.id == id
+    assert len(statuses) == 3
+    assert all([status.id != id and status.name != 'new' for status in statuses])

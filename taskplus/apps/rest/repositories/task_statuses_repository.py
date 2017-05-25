@@ -35,7 +35,7 @@ class TaskStatusesRepository(Repository):
         return [TaskStatus(id=status.id, name=status.name) for status in result]
 
     def update(self, status):
-        status_to_update = self.status_model.get(status.id)
+        status_to_update = self.status_model.query.get(status.id)
         status_to_update.name = status.name
 
         self.session.add(status_to_update)
@@ -44,9 +44,16 @@ class TaskStatusesRepository(Repository):
         return TaskStatus(id=status_to_update.id, name=status_to_update.name)
 
     def save(self, status):
-        new_status = self.status_model(status.name)
+        new_status = self.status_model(name=status.name)
 
         self.session.add(new_status)
         self.session.commit()
 
         return TaskStatus(id=new_status.id, name=new_status.name)
+
+    def delete(self, id):
+        status = self.status_model.query.get(id)
+        self.session.delete(status)
+        self.session.commit()
+
+        return TaskStatus(id=id, name=status.name)
