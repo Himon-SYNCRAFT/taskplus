@@ -1,6 +1,8 @@
+import pytest
 from collections import namedtuple
 from sqlalchemy import event
 from sqlalchemy.engine import Engine
+from sqlalchemy.orm.exc import NoResultFound
 
 from taskplus.apps.rest.database import Base, db_session, engine
 from taskplus.apps.rest.repositories import UsersRepository
@@ -11,6 +13,7 @@ from taskplus.core.shared.domain_model import DomainModel
 user_ = namedtuple('user_', ['id', 'name', 'role_id', 'role_name'])
 creator_ = user_(id=1, name='creator', role_id=1, role_name='creator_role')
 doer_ = user_(id=2, name='doer', role_id=2, role_name='doer_role')
+repository = UsersRepository()
 
 
 def setup_function():
@@ -47,8 +50,7 @@ def setup_function():
 
 def test_users_repository_one():
     id, name, role_id, role_name = creator_
-    repo = UsersRepository()
-    result = repo.one(id)
+    result = repository.one(id)
 
     assert result.id == id
     assert result.name == name
@@ -58,18 +60,15 @@ def test_users_repository_one():
 
 
 def test_users_repository_one_non_existing_user():
-    repo = UsersRepository()
-    result = repo.one(99)
-
-    assert result is None
+    with pytest.raises(NoResultFound):
+        repository.one(99)
 
 
 def test_users_repository_list():
     creator_id, creator_name, creator_role_id, creator_role_name = creator_
     doer_id, doer_name, doer_role_id, doer_role_name = doer_
 
-    repo = UsersRepository()
-    result = repo.list()
+    result = repository.list()
 
     assert len(result) == 2
     assert any([user.id == creator_id and
@@ -92,8 +91,7 @@ def test_users_repository_save():
         name='user',
         role=UserRole(name=creator_role_name, id=creator_role_id)
     )
-    repo = UsersRepository()
-    result = repo.save(user)
+    result = repository.save(user)
 
     assert result.name == user.name
     assert result.role.id == user.role.id
@@ -109,11 +107,92 @@ def test_users_repository_update():
         role=UserRole(name=creator_role_name, id=creator_role_id),
         id=1
     )
-    repo = UsersRepository()
-    result = repo.update(user)
+    result = repository.update(user)
 
     assert result.id == user.id
     assert result.name == user.name
     assert result.role.id == user.role.id
     assert result.role.name == user.role.name
     assert isinstance(result, DomainModel)
+
+
+def test_users_repository_with_filter_gt():
+    filters = {
+        'id__gt': 1
+    }
+
+    result = repository.list(filters)
+
+    for i, user in enumerate(result):
+        assert isinstance(user, DomainModel)
+        assert user.id != 1
+
+    assert len(result) == 1
+
+
+def test_users_repository_with_filter_lt():
+    filters = {
+        'id__lt': 2
+    }
+
+    result = repository.list(filters)
+
+    for i, user in enumerate(result):
+        assert isinstance(user, DomainModel)
+        assert user.id != 2
+
+    assert len(result) == 1
+
+
+def test_users_repository_with_filter_ne():
+    filters = {
+        'id__ne': 2
+    }
+
+    result = repository.list(filters)
+
+    for i, user in enumerate(result):
+        assert isinstance(user, DomainModel)
+        assert user.id != 2
+
+    assert len(result) == 1
+
+
+def test_users_repository_with_filter_ge():
+    filters = {
+        'id__ge': 2
+    }
+
+    result = repository.list(filters)
+
+    for i, user in enumerate(result):
+        assert isinstance(user, DomainModel)
+        assert user.id != 1
+
+    assert any([user.id == 2 for user in result])
+    assert len(result) == 1
+
+
+def test_users_repository_with_filter_le():
+    filters = {
+        'id__le': 1
+    }
+
+    result = repository.list(filters)
+
+    for i, user in enumerate(result):
+        assert isinstance(user, DomainModel)
+
+    assert any([user.id == 1 for user in result])
+    assert len(result) == 1
+
+
+def test_users_repository_delete():
+    user_id = 1
+
+    result = repository.delete(user_id)
+    assert result.id == user_id
+
+    result = repository.list()
+    assert len(result) == 1
+    assert all([user.id != user_id for user in result])

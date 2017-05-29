@@ -27,7 +27,7 @@ class Repository(object):
 
         return result
 
-    def one(self):
+    def one(self, id):
         raise NotImplementedError('one() not implemented by Repository class')
 
     def list(self, filters=None):
@@ -36,10 +36,10 @@ class Repository(object):
     def delete(self, id):
         raise NotImplementedError('delete() not implemented by Repository class')
 
-    def update(self):
+    def update(self, domain_model):
         raise NotImplementedError('update() not implemented by Repository class')
 
-    def save(self):
+    def save(self, domain_model):
         raise NotImplementedError('save() not implemented by Repository class')
 
 

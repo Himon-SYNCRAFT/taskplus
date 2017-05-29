@@ -11,11 +11,7 @@ class TaskStatusesRepository(Repository):
         self.session = db_session
 
     def one(self, id):
-        status = self.status_model.query.get(id)
-
-        if not status:
-            return None
-
+        status = self.status_model.query.filter_by(id=id).one()
         return TaskStatus(id=status.id, name=status.name)
 
     def list(self, filters=None):
@@ -35,7 +31,7 @@ class TaskStatusesRepository(Repository):
         return [TaskStatus(id=status.id, name=status.name) for status in result]
 
     def update(self, status):
-        status_to_update = self.status_model.query.get(status.id)
+        status_to_update = self.status_model.query.filter_by(id=status.id).one()
         status_to_update.name = status.name
 
         self.session.add(status_to_update)
@@ -52,7 +48,7 @@ class TaskStatusesRepository(Repository):
         return TaskStatus(id=new_status.id, name=new_status.name)
 
     def delete(self, id):
-        status = self.status_model.query.get(id)
+        status = self.status_model.query.filter_by(id=id).one()
         self.session.delete(status)
         self.session.commit()
 

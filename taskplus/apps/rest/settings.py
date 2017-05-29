@@ -26,4 +26,4 @@ class TestConfig(Config):
     ENV = 'test'
     TESTING = True
     DEBUG = True
-    DB_URI = 'sqlite:///test.db'
+    DB_URI = 'sqlite:///'

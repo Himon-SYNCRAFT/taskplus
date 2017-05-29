@@ -1,11 +1,16 @@
+import pytest
 from sqlalchemy import event
 from sqlalchemy.engine import Engine
+from sqlalchemy.orm.exc import NoResultFound
 
 from taskplus.apps.rest.database import Base, db_session, engine
 from taskplus.apps.rest.repositories import TaskStatusesRepository
 from taskplus.core.domain import Statuses
 from taskplus.core.domain import TaskStatus
 from taskplus.core.shared.domain_model import DomainModel
+
+
+repository = TaskStatusesRepository()
 
 
 def setup_function():
@@ -36,7 +41,6 @@ def setup_function():
 
 def test_statuses_repository_one():
     id = Statuses.NEW.value
-    repository = TaskStatusesRepository()
     result = repository.one(id)
 
     assert isinstance(result, DomainModel)
@@ -45,14 +49,11 @@ def test_statuses_repository_one():
 
 
 def test_statuses_repository_one_non_existing_status():
-    repository = TaskStatusesRepository()
-    result = repository.one(99)
-
-    assert result is None
+    with pytest.raises(NoResultFound):
+        repository.one(99)
 
 
 def test_statuses_repository_list():
-    repository = TaskStatusesRepository()
     result = repository.list()
 
     for i, status in enumerate(result):
@@ -66,7 +67,6 @@ def test_statuses_repository_list_with_filters():
         'name': 'new'
     }
 
-    repository = TaskStatusesRepository()
     result = repository.list(filters)[0]
 
     assert isinstance(result, DomainModel)
@@ -78,7 +78,6 @@ def test_statuses_repository_with_filter_gt():
         'id__gt': 1
     }
 
-    repository = TaskStatusesRepository()
     result = repository.list(filters)
 
     for i, status in enumerate(result):
@@ -93,7 +92,6 @@ def test_statuses_repository_with_filter_lt():
         'id__lt': 4
     }
 
-    repository = TaskStatusesRepository()
     result = repository.list(filters)
 
     for i, status in enumerate(result):
@@ -108,7 +106,6 @@ def test_statuses_repository_with_filter_ne():
         'id__ne': 2
     }
 
-    repository = TaskStatusesRepository()
     result = repository.list(filters)
 
     for i, status in enumerate(result):
@@ -123,7 +120,6 @@ def test_statuses_repository_with_filter_ge():
         'id__ge': 2
     }
 
-    repository = TaskStatusesRepository()
     result = repository.list(filters)
 
     for i, status in enumerate(result):
@@ -139,7 +135,6 @@ def test_statuses_repository_with_filter_le():
         'id__le': 2
     }
 
-    repository = TaskStatusesRepository()
     result = repository.list(filters)
 
     for i, status in enumerate(result):
@@ -154,7 +149,6 @@ def test_statuses_repository_update():
     id = 1
     name = 'suspended'
 
-    repository = TaskStatusesRepository()
     result = repository.update(TaskStatus(id=id, name=name))
 
     assert isinstance(result, DomainModel)
@@ -164,7 +158,6 @@ def test_statuses_repository_update():
 
 def test_statuses_repository_save():
     status_name = 'suspended'
-    repository = TaskStatusesRepository()
     result = repository.save(TaskStatus(name=status_name))
 
     assert isinstance(result, DomainModel)
@@ -173,7 +166,6 @@ def test_statuses_repository_save():
 
 def test_statuses_repository_delete():
     id = Statuses.NEW.value
-    repository = TaskStatusesRepository()
     result = repository.delete(id)
     statuses = repository.list()
 
