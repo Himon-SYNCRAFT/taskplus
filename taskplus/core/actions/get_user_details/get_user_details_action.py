@@ -8,5 +8,5 @@ class GetUserDetailsAction(Action):
         self.users_repo = users_repo
 
     def process_request(self, request):
-        user = self.users_repo.get(request.user_id)
+        user = self.users_repo.one(request.user_id)
         return ResponseSuccess(user)

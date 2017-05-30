@@ -10,10 +10,10 @@ def test_add_user_action():
     role_id = 1
 
     roles_repo = mock.Mock()
-    roles_repo.get.return_value = UserRole(name='role_name')
+    roles_repo.one.return_value = UserRole(name='role_name')
 
     users_repo = mock.Mock()
-    users_repo.save.return_value = User(name, roles_repo.get.return_value)
+    users_repo.save.return_value = User(name, roles_repo.one.return_value)
 
     request = AddUserRequest(name=name, role_id=role_id)
     action = AddUserAction(users_repo, roles_repo)
@@ -30,10 +30,10 @@ def test_add_user_action_handles_bad_request():
     role_id = None
 
     roles_repo = mock.Mock()
-    roles_repo.get.return_value = UserRole(name='role_name')
+    roles_repo.one.return_value = UserRole(name='role_name')
 
     users_repo = mock.Mock()
-    users_repo.save.return_value = User('name', roles_repo.get.return_value)
+    users_repo.save.return_value = User('name', roles_repo.one.return_value)
 
     request = AddUserRequest(name=name, role_id=role_id)
     action = AddUserAction(users_repo, roles_repo)

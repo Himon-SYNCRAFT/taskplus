@@ -8,5 +8,5 @@ class GetTaskDetailsAction(Action):
         self.tasks_repo = tasks_repo
 
     def process_request(self, request):
-        task = self.tasks_repo.get(request.task_id)
+        task = self.tasks_repo.one(request.task_id)
         return ResponseSuccess(task)

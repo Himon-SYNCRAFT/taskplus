@@ -19,6 +19,7 @@ class DevConfig(Config):
     """Development configuration."""
     ENV = 'dev'
     DEBUG = True
+    DB_URI = 'sqlite:///dev.db'
 
 
 class TestConfig(Config):

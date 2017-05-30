@@ -8,5 +8,5 @@ class GetRoleDetailsAction(Action):
         self.roles_repo = roles_repo
 
     def process_request(self, request):
-        role = self.roles_repo.get(request.role_id)
+        role = self.roles_repo.one(request.role_id)
         return ResponseSuccess(role)
