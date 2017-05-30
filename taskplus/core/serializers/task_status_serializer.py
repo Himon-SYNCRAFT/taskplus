@@ -1,7 +1,7 @@
 import json
 
 
-class UserRoleEncoder(json.JSONEncoder):
+class TaskStatusEncoder(json.JSONEncoder):
 
     def default(self, data):
         try:
@@ -10,6 +10,5 @@ class UserRoleEncoder(json.JSONEncoder):
                 'name': data.name
             }
             return to_serialize
-
         except AttributeError:
             return super().default(data)
