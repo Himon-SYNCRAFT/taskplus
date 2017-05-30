@@ -83,3 +83,16 @@ from taskplus.core.actions.list_tasks.list_tasks_request\
      import ListTasksRequest
 from taskplus.core.actions.list_tasks.list_tasks_action\
      import ListTasksAction
+
+from taskplus.core.actions.list_task_statuses.list_task_statuses_request\
+     import ListTaskStatusesRequest
+from taskplus.core.actions.list_task_statuses.list_task_statuses_action\
+     import ListTaskStatusesAction
+
+from taskplus.core.actions.add_task_status import AddTaskStatusAction, AddTaskStatusRequest
+
+from taskplus.core.actions.get_task_status_details import GetTaskStatusDetailsAction, GetTaskStatusDetailsRequest
+
+from taskplus.core.actions.delete_task_status import DeleteTaskStatusAction, DeleteTaskStatusRequest
+
+from taskplus.core.actions.update_task_status import UpdateTaskStatusAction, UpdateTaskStatusRequest

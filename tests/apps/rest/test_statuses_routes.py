@@ -10,19 +10,19 @@ status = TaskStatus(name='new', id=1)
 statuses = [status]
 
 
-@mock.patch('taskplus.apps.rest.routes.ListTaskStatusesAction')
-def test_get_roles_list(mock_action, client):
-    response = ResponseSuccess(statuses)
-    mock_action().execute.return_value = response
+# @mock.patch('taskplus.apps.rest.routes.ListTaskStatusesAction')
+# def test_get_roles_list(mock_action, client):
+#     response = ResponseSuccess(statuses)
+#     mock_action().execute.return_value = response
 
-    http_response = client.get('/statuses')
+#     http_response = client.get('/statuses')
 
-    assert json.loads(http_response.data.decode('UTF-8')) == [{
-        'name': status.name,
-        'id': status.id
-    }]
-    assert http_response.status_code == 200
-    assert http_response.mimetype == 'application/json'
+#     assert json.loads(http_response.data.decode('UTF-8')) == [{
+#         'name': status.name,
+#         'id': status.id
+#     }]
+#     assert http_response.status_code == 200
+#     assert http_response.mimetype == 'application/json'
 
 
 # @mock.patch('taskplus.apps.rest.routes.GetRoleDetailsAction')
