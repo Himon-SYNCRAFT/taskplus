@@ -2,6 +2,7 @@ from taskplus.apps.rest import models
 from taskplus.apps.rest.database import db_session
 from taskplus.core.domain import User, UserRole
 from taskplus.core.shared.repository import Repository
+from taskplus.core.shared.exceptions import NoResultFound
 
 
 class UsersRepository(Repository):
@@ -10,8 +11,11 @@ class UsersRepository(Repository):
         self.user_model = models.User
         self.session = db_session
 
-    def one(self, user_id):
-        result = self.user_model.query.filter_by(id=user_id).one()
+    def one(self, id):
+        result = self.user_model.query.get(id)
+
+        if not result:
+            raise NoResultFound(id, User.__name__)
 
         role = UserRole(id=result.role.id, name=result.role.name)
         return User(name=result.name, role=role, id=result.id)
@@ -49,7 +53,10 @@ class UsersRepository(Repository):
         return User(name=new_user.name, role=role, id=new_user.id)
 
     def update(self, user):
-        user_to_update = self.user_model.query.filter_by(id=user.id).one()
+        user_to_update = self.user_model.query.get(user.id)
+
+        if not user_to_update:
+            raise NoResultFound(user.id, User.__name__)
 
         user_to_update.name = user.name
         user_to_update.role_id = user.role.id
@@ -61,7 +68,11 @@ class UsersRepository(Repository):
         return User(name=user_to_update.name, role=role, id=user_to_update.id)
 
     def delete(self, id):
-        user = self.user_model.query.filter_by(id=id).one()
+        user = self.user_model.query.get(id)
+
+        if not user:
+            raise NoResultFound(id, User.__name__)
+
         role = UserRole(id=user.role.id, name=user.role.name)
 
         self.session.delete(user)

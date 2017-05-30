@@ -2,6 +2,7 @@ from taskplus.apps.rest import models
 from taskplus.apps.rest.database import db_session
 from taskplus.core.domain import UserRole
 from taskplus.core.shared.repository import Repository
+from taskplus.core.shared.exceptions import NoResultFound
 
 
 class UserRolesRepository(Repository):
@@ -26,11 +27,19 @@ class UserRolesRepository(Repository):
         return [UserRole(id=role.id, name=role.name) for role in result]
 
     def one(self, id):
-        result = self.role_model.query.filter_by(id=id).one()
-        return UserRole(id=result.id, name=result.id)
+        result = self.role_model.query.get(id)
+
+        if not result:
+            raise NoResultFound(id, UserRole.__name__)
+
+        return UserRole(id=result.id, name=result.name)
 
     def update(self, role):
-        role_to_update = self.role_model.query.filter_by(id=role.id).one()
+        role_to_update = self.role_model.query.get(role.id)
+
+        if not role_to_update:
+            raise NoResultFound(role.id, UserRole.__name__)
+
         role_to_update.name = role.name
 
         self.session.add(role_to_update)
@@ -46,7 +55,11 @@ class UserRolesRepository(Repository):
         return UserRole(id=new_role.id, name=new_role.name)
 
     def delete(self, id):
-        role_to_delete = self.role_model.query.filter_by(id=id).one()
+        role_to_delete = self.role_model.query.get(id)
+
+        if not role_to_delete:
+            raise NoResultFound(id, UserRole.__name__)
+
         role = UserRole(id=role_to_delete.id, name=role_to_delete.name)
 
         self.session.delete(role_to_delete)

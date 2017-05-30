@@ -1,12 +1,12 @@
 import pytest
 from sqlalchemy import event
 from sqlalchemy.engine import Engine
-from sqlalchemy.orm.exc import NoResultFound
 
 from taskplus.apps.rest.database import Base, db_session, engine
 from taskplus.apps.rest.repositories import TasksRepository
-from taskplus.core.shared.domain_model import DomainModel
 from taskplus.core.domain import Statuses, Task, User, TaskStatus, UserRole
+from taskplus.core.shared.domain_model import DomainModel
+from taskplus.core.shared.exceptions import NoResultFound
 
 
 repository = TasksRepository()

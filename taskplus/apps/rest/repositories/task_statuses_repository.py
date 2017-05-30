@@ -2,6 +2,7 @@ from taskplus.apps.rest import models
 from taskplus.apps.rest.database import db_session
 from taskplus.core.domain import TaskStatus
 from taskplus.core.shared.repository import Repository
+from taskplus.core.shared.exceptions import NoResultFound
 
 
 class TaskStatusesRepository(Repository):
@@ -11,7 +12,11 @@ class TaskStatusesRepository(Repository):
         self.session = db_session
 
     def one(self, id):
-        status = self.status_model.query.filter_by(id=id).one()
+        status = self.status_model.query.get(id)
+
+        if not status:
+            raise NoResultFound(id, TaskStatus.__name__)
+
         return TaskStatus(id=status.id, name=status.name)
 
     def list(self, filters=None):
@@ -31,7 +36,11 @@ class TaskStatusesRepository(Repository):
         return [TaskStatus(id=status.id, name=status.name) for status in result]
 
     def update(self, status):
-        status_to_update = self.status_model.query.filter_by(id=status.id).one()
+        status_to_update = self.status_model.query.get(status.id)
+
+        if not status:
+            raise NoResultFound(status.id, TaskStatus.__name__)
+
         status_to_update.name = status.name
 
         self.session.add(status_to_update)
@@ -48,7 +57,11 @@ class TaskStatusesRepository(Repository):
         return TaskStatus(id=new_status.id, name=new_status.name)
 
     def delete(self, id):
-        status = self.status_model.query.filter_by(id=id).one()
+        status = self.status_model.query.get(id)
+
+        if not status:
+            raise NoResultFound(id, TaskStatus.__name__)
+
         self.session.delete(status)
         self.session.commit()
 

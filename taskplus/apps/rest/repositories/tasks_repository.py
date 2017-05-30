@@ -2,6 +2,7 @@ from taskplus.apps.rest import models
 from taskplus.apps.rest.database import db_session
 from taskplus.core.shared.repository import Repository
 from taskplus.core.domain import Task, User, TaskStatus, UserRole
+from taskplus.core.shared.exceptions import NoResultFound
 
 
 class TasksRepository(Repository):
@@ -11,7 +12,11 @@ class TasksRepository(Repository):
         self.session = db_session
 
     def one(self, id):
-        result = self.task_model.query.filter_by(id=id).one()
+        result = self.task_model.query.get(id)
+
+        if not result:
+            raise NoResultFound(id, Task.__name__)
+
         return self._to_domain_model(result)
 
     def list(self, filters=None):
@@ -41,7 +46,11 @@ class TasksRepository(Repository):
         return [self._to_domain_model(task) for task in result]
 
     def update(self, task):
-        task_to_update = self.task_model.query.filter_by(id=task.id).one()
+        task_to_update = self.task_model.query.get(task.id)
+
+        if not task_to_update:
+            raise NoResultFound(task.id, Task.__name__)
+
         task_to_update.status_id = task.status.id
         task_to_update.creator_id = task.creator.id
         task_to_update.doer_id = task.doer.id
@@ -73,7 +82,11 @@ class TasksRepository(Repository):
         return self._to_domain_model(task_to_save)
 
     def delete(self, id):
-        result = self.task_model.query.filter_by(id=id).one()
+        result = self.task_model.query.get(id)
+
+        if not result:
+            raise NoResultFound(id, Task.__name__)
+
         task = self._to_domain_model(result)
 
         self.session.delete(result)
