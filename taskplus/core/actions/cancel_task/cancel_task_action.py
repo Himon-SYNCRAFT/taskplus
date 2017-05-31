@@ -10,10 +10,10 @@ class CancelTaskAction(Action):
         self.status_repo = status_repo
 
     def process_request(self, request):
-        status = self.status_repo.get(Statuses.CANCELED)
+        status = self.status_repo.one(Statuses.CANCELED)
 
         task_id = request.task_id
-        task = self.task_repo.get(task_id)
+        task = self.task_repo.one(task_id)
         task.task_status = status
 
         response = self.task_repo.update(task)

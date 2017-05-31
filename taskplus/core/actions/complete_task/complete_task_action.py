@@ -11,8 +11,8 @@ class CompleteTaskAction(Action):
 
     def process_request(self, request):
         task_id = request.task_id
-        status = self.status_repo.get(Statuses.COMPLETED)
-        task = self.task_repo.get(task_id)
+        status = self.status_repo.one(Statuses.COMPLETED)
+        task = self.task_repo.one(task_id)
         task.status = status
 
         response = self.task_repo.update(task)

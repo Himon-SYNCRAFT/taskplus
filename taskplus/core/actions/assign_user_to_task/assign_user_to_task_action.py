@@ -12,8 +12,8 @@ class AssignUserToTaskAction(Action):
         task_id = request.task_id
         user_id = request.user_id
 
-        user = self.users_repo.get(user_id)
-        task = self.tasks_repo.get(task_id)
+        user = self.users_repo.one(user_id)
+        task = self.tasks_repo.one(task_id)
         task.doer = user
 
         response = self.tasks_repo.update(task)

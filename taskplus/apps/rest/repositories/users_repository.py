@@ -24,6 +24,7 @@ class UsersRepository(Repository):
         if not filters:
             result = self.user_model.query.all()
         else:
+            print('t')
             filters = self._parse_filters(filters)
             filters_expression = []
 
