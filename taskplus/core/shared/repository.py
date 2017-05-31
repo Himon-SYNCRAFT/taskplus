@@ -7,7 +7,7 @@ class Repository(object):
         if not filters:
             return None
 
-        allowed_operators = ['eq', 'lt', 'le', 'ne', 'ge', 'gt']
+        allowed_operators = ['eq', 'lt', 'le', 'ne', 'ge', 'gt', 'in', 'notin']
         result = []
 
         for key, value in filters.items():
@@ -21,7 +21,10 @@ class Repository(object):
                     operator
                 ))
 
-            operator = '__{}__'.format(operator)
+            if operator in ['in', 'notin']:
+                operator = '{}_'.format(operator)
+            else:
+                operator = '__{}__'.format(operator)
 
             result.append(Filter(key, operator, value))
 

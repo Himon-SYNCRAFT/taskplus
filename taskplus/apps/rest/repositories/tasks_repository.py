@@ -24,24 +24,7 @@ class TasksRepository(Repository):
             result = self.task_model.query.all()
         else:
             filters = self._parse_filters(filters)
-            filters_expression = []
-
-            for filter in filters:
-                if filter.key == 'status_name':
-                    filters_expression.append(
-                        self.task_model.status.has(name=filter.value))
-                elif filter.key == 'creator_name':
-                    filters_expression.append(
-                        self.task_model.creator.has(name=filter.value))
-                elif filter.key == 'doer_name':
-                    filters_expression.append(
-                        self.task_model.doer.has(name=filter.value))
-                else:
-                    key = getattr(self.task_model, filter.key)
-                    filters_expression.append(
-                        getattr(key, filter.operator)(filter.value))
-
-            result = self.task_model.query.filter(*filters_expression).all()
+            result = self.task_model.query.filter(*filters).all()
 
         return [self._to_domain_model(task) for task in result]
 
@@ -122,3 +105,27 @@ class TasksRepository(Repository):
             doer=doer,
             id=data.id
         )
+
+    def _parse_filters(self, filters=None):
+        if not filters:
+            return None
+
+        filters = super()._parse_filters(filters)
+        filters_expression = []
+
+        for filter in filters:
+            if filter.key == 'status_name':
+                filters_expression.append(
+                    self.task_model.status.has(name=filter.value))
+            elif filter.key == 'creator_name':
+                filters_expression.append(
+                    self.task_model.creator.has(name=filter.value))
+            elif filter.key == 'doer_name':
+                filters_expression.append(
+                    self.task_model.doer.has(name=filter.value))
+            else:
+                key = getattr(self.task_model, filter.key)
+                filters_expression.append(
+                    getattr(key, filter.operator)(filter.value))
+
+        return filters_expression

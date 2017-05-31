@@ -142,6 +142,33 @@ def test_tasks_repository_with_filter_ge():
     assert len(result) == 1
 
 
+def test_tasks_repository_with_filter_in():
+    filters = {
+        'id__in': [1, 2]
+    }
+
+    result = repository.list(filters)
+
+    for i, task in enumerate(result):
+        assert isinstance(task, DomainModel)
+
+    assert len(result) == 2
+
+
+def test_tasks_repository_with_filter_notin():
+    filters = {
+        'id__notin': [2]
+    }
+
+    result = repository.list(filters)
+
+    for i, task in enumerate(result):
+        assert isinstance(task, DomainModel)
+        assert task.id != 2
+
+    assert len(result) == 1
+
+
 def test_tasks_repository_with_filter_le():
     filters = {
         'id__le': 1

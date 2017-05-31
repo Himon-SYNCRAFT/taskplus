@@ -25,6 +25,23 @@ def test_get_statuses_list(mock_action, client):
     assert http_response.mimetype == 'application/json'
 
 
+@mock.patch('taskplus.apps.rest.routes.ListTaskStatusesAction')
+def test_get_statuses_list_with_filters(mock_action, client):
+    response = ResponseSuccess(statuses)
+    mock_action().execute.return_value = response
+
+    data = json.dumps(dict(filters=dict(name='new')))
+    http_response = client.post('/statuses', data=data,
+                                content_type='application/json')
+
+    assert json.loads(http_response.data.decode('UTF-8')) == [{
+        'name': status.name,
+        'id': status.id
+    }]
+    assert http_response.status_code == 200
+    assert http_response.mimetype == 'application/json'
+
+
 @mock.patch('taskplus.apps.rest.routes.GetTaskStatusDetailsAction')
 def test_get_status_details(mock_action, client):
     response = ResponseSuccess(status)

@@ -29,6 +29,27 @@ def test_get_users_list(mock_action, client):
     assert http_response.mimetype == 'application/json'
 
 
+@mock.patch('taskplus.apps.rest.routes.ListUsersAction')
+def test_get_users_list_with_filters(mock_action, client):
+    response = ResponseSuccess(users)
+    mock_action().execute.return_value = response
+
+    data = json.dumps(dict(filters=dict(name=user.name)))
+    http_response = client.post('/users', data=data,
+                                content_type='application/json')
+
+    assert json.loads(http_response.data.decode('UTF-8')) == [{
+        'name': user.name,
+        'id': user.id,
+        'role': {
+            'id': user.role.id,
+            'name': user.role.name,
+        }
+    }]
+    assert http_response.status_code == 200
+    assert http_response.mimetype == 'application/json'
+
+
 @mock.patch('taskplus.apps.rest.routes.GetUserDetailsAction')
 def test_get_user_details(mock_action, client):
     response = ResponseSuccess(user)

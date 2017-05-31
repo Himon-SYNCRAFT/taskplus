@@ -25,6 +25,23 @@ def test_get_roles_list(mock_action, client):
     assert http_response.mimetype == 'application/json'
 
 
+@mock.patch('taskplus.apps.rest.routes.ListUserRolesAction')
+def test_get_roles_list_with_filters(mock_action, client):
+    response = ResponseSuccess(roles)
+    mock_action().execute.return_value = response
+
+    filters = json.dumps(dict(filters=dict(name=role_name)))
+    http_response = client.post('/roles', data=filters,
+                                content_type='application/json')
+
+    assert json.loads(http_response.data.decode('UTF-8')) == [{
+        'name': role.name,
+        'id': role.id
+    }]
+    assert http_response.status_code == 200
+    assert http_response.mimetype == 'application/json'
+
+
 @mock.patch('taskplus.apps.rest.routes.GetRoleDetailsAction')
 def test_get_role_details(mock_action, client):
     response = ResponseSuccess(role)

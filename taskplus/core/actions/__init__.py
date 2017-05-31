@@ -96,3 +96,4 @@ from taskplus.core.actions.get_task_status_details import GetTaskStatusDetailsAc
 from taskplus.core.actions.delete_task_status import DeleteTaskStatusAction, DeleteTaskStatusRequest
 
 from taskplus.core.actions.update_task_status import UpdateTaskStatusAction, UpdateTaskStatusRequest
+from taskplus.core.actions.get_not_completed_tasks import GetNotCompletedTasksAction, GetNotCompletedTasksRequest

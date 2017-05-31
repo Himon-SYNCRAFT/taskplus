@@ -7,5 +7,5 @@ class ListTasksAction(Action):
         self.repo = repo
 
     def process_request(self, request):
-        response = self.repo.list(request)
+        response = self.repo.list(filters=request.filters)
         return ResponseSuccess(response)

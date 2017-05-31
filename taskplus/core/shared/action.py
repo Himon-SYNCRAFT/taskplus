@@ -1,3 +1,5 @@
+import sys
+import traceback
 from taskplus.core.shared.response import ResponseFailure
 
 
@@ -10,6 +12,7 @@ class Action(object):
         try:
             return self.process_request(request)
         except Exception as exc:
+            traceback.print_tb(sys.exc_info()[2])
             return ResponseFailure.build_system_error(
                 '{}: {}'.format(exc.__class__.__name__, exc)
             )
