@@ -4,7 +4,7 @@ from setuptools.command.test import test as TestCommand
 import codecs
 import os
 import sys
-import re
+
 
 HERE = os.path.abspath(os.path.dirname(__file__))
 
@@ -12,8 +12,8 @@ HERE = os.path.abspath(os.path.dirname(__file__))
 def read(*parts):
     """Return multiple read calls to different readable objects as a single
     string."""
-    # intentionally *not* adding an encoding option to open
     return codecs.open(os.path.join(HERE, *parts), 'r').read()
+
 
 # LONG_DESCRIPTION = read('README.rst')
 LONG_DESCRIPTION = ''
@@ -34,15 +34,17 @@ class PyTest(TestCommand):
         errno = pytest.main(self.test_args)
         sys.exit(errno)
 
+
 setup(
     name='taskplus',
     version='1.0.0',
     url='https://github.com/Himon-SYNCRAFT/taskplus',
-    license='Apache Software License',
+    license='BSD',
     author='Daniel Zawlocki',
-    tests_require=['pytest', 'pytest-cov', 'coverage', 'six'],
+    tests_require=['pytest', 'pytest-cov', 'coverage', 'six', 'pytest-flask'],
     install_requires=[
         'Flask>=0.12.2',
+        'Flask-Script>=2.0.5',
         'SQLAlchemy==1.1.10',
         'pytest-flask>=0.10.0',
         'six',
@@ -56,15 +58,4 @@ setup(
     platforms='any',
     test_suite='tests',
     zip_safe=False,
-    classifiers=[
-        'Programming Language :: Python',
-        'Programming Language :: Python :: 2',
-        'Programming Language :: Python :: 3',
-        'Development Status :: 4 - Beta',
-        'Natural Language :: English',
-        'Environment :: Web Environment',
-        'License :: OSI Approved :: Apache Software License',
-        'Operating System :: OS Independent',
-        'Topic :: Software Development :: Libraries :: Application Frameworks',
-        ],
 )
