@@ -10,7 +10,7 @@ doer_role = UserRole(name='doer_role', id=2)
 creator_role = UserRole(name='creator_role', id=1)
 creator = User(name='creator', role=creator_role, id=1)
 doer = User(name='doer', role=doer_role, id=2)
-status_new = TaskStatus(id=Statuses.NEW.value, name='new')
+status_new = TaskStatus(id=Statuses.NEW, name='new')
 
 
 @pytest.fixture()
@@ -219,7 +219,7 @@ def test_add_task(mock_action, client, task, tasks):
 
 @mock.patch('taskplus.apps.rest.routes.CancelTaskAction')
 def test_cancel_task(mock_action, client, task, tasks):
-    task.status = TaskStatus(id=Statuses.CANCELED.value, name='canceled')
+    task.status = TaskStatus(id=Statuses.CANCELED, name='canceled')
     response = ResponseSuccess(task)
     mock_action().execute.return_value = response
 
@@ -256,7 +256,7 @@ def test_cancel_task(mock_action, client, task, tasks):
 
 @mock.patch('taskplus.apps.rest.routes.CompleteTaskAction')
 def test_completed_task(mock_action, client, task, tasks):
-    task.status = TaskStatus(id=Statuses.COMPLETED.value, name='completed')
+    task.status = TaskStatus(id=Statuses.COMPLETED, name='completed')
     response = ResponseSuccess(task)
     mock_action().execute.return_value = response
 

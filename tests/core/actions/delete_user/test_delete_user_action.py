@@ -14,7 +14,7 @@ def test_delete_user_action():
 
     assert bool(response) is True
     assert response.value == repo.delete.return_value
-    repo.delete.assert_called_once()
+    assert repo.delete.called
 
 
 def test_delete_user_action_handles_bad_request():

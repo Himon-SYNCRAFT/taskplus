@@ -14,7 +14,7 @@ def test_assign_user_to_task_action():
     response = action.execute(request)
 
     assert bool(response) is True
-    tasks_repo.update.assert_called_once()
+    assert tasks_repo.update.called
 
 
 def test_assing_user_to_task_action_handles_bad_request():
@@ -46,7 +46,7 @@ def test_assign_user_to_task_action_handles_generic_error():
     response = action.execute(request)
 
     assert bool(response) is False
-    tasks_repo.update.assert_called_once()
+    assert tasks_repo.update.called
     assert response.value == {
         'type': ResponseFailure.SYSTEM_ERROR,
         'message': 'Exception: {}'.format(error_message)

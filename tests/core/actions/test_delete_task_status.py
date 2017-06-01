@@ -27,6 +27,6 @@ def test_delete_task_status():
     action = DeleteTaskStatusAction(repo=repo)
     response = action.execute(request)
 
-    repo.delete.assert_called_once()
+    assert repo.delete.called
     assert bool(response) is True
     assert response.value == repo.delete.return_value

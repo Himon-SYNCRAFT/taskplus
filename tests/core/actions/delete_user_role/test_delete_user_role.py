@@ -13,6 +13,6 @@ def test_delete_user_role():
     action = DeleteUserRoleAction(repo=repo)
     response = action.execute(request)
 
-    repo.delete.assert_called_once()
+    assert repo.delete.called
     assert bool(response) is True
     assert response.value == repo.delete.return_value

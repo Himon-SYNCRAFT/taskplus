@@ -45,7 +45,7 @@ def test_update_task_status():
     response = action.execute(request)
 
     assert bool(response) is True
-    repo.update.assert_called_once()
+    assert repo.update.called
     assert response.value == repo.one.return_value
 
 
@@ -73,7 +73,7 @@ def test_update_user_handle_generic_error():
     response = action.execute(request)
 
     assert bool(response) is False
-    repo.update.assert_called_once()
+    assert repo.update.called
     assert response.value == {
         'type': ResponseFailure.SYSTEM_ERROR,
         'message': 'Exception: {}'.format(error_message)

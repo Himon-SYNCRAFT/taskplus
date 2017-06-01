@@ -20,7 +20,7 @@ def test_add_user_action():
 
     response = action.execute(request)
 
-    users_repo.save.assert_called_once()
+    assert users_repo.save.called
     assert bool(response) is True
     assert response.value == users_repo.save.return_value
 

@@ -14,7 +14,7 @@ def test_add_user_role_action():
     response = action.execute(request)
 
     assert bool(response) is True
-    roles_repo.save.assert_called_once()
+    assert roles_repo.save.called
     assert response.value == roles_repo.save.return_value
 
 
@@ -45,7 +45,7 @@ def test_add_user_role_action_handles_generic_error():
     response = action.execute(request)
 
     assert bool(response) is False
-    roles_repo.save.assert_called_once()
+    assert roles_repo.save.called
     assert response.value == {
         'type': ResponseFailure.SYSTEM_ERROR,
         'message': 'Exception: {}'.format(error_message)

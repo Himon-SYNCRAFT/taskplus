@@ -12,7 +12,7 @@ class AddTaskAction(Action):
 
     def process_request(self, request):
         creator = self.users_repo.get(request.creator_id)
-        status = self.statuses_repo.get(Statuses.NEW.value)
+        status = self.statuses_repo.get(Statuses.NEW)
 
         task = Task(name=request.name,
                     content=request.content,

@@ -16,7 +16,7 @@ def test_update_user_action():
     response = action.execute(request)
 
     assert bool(response) is True
-    users_repo.update.assert_called_once()
+    assert users_repo.update.called
     assert response.value == users_repo.update.return_value
 
 

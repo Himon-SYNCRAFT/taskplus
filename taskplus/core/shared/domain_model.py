@@ -1,5 +1,7 @@
 from abc import ABCMeta
+import six
 
 
-class DomainModel(metaclass=ABCMeta):
+@six.add_metaclass(ABCMeta)
+class DomainModel(object):
     pass

@@ -15,7 +15,7 @@ def test_add_task_action():
     tasks_repo = mock.Mock()
     statuses_repo = mock.Mock()
 
-    tasks_repo.save.retur_value = Task(name=task_name, content=task_content,
+    tasks_repo.save.return_value = Task(name=task_name, content=task_content,
                                        status=mock.Mock(), creator=mock.Mock(),
                                        doer=None, id=task_id)
 
@@ -25,7 +25,7 @@ def test_add_task_action():
     response = action.execute(request)
 
     assert bool(response) is True
-    tasks_repo.save.assert_called_once()
+    assert tasks_repo.save.called
     assert response.value == tasks_repo.save.return_value
 
 
@@ -65,7 +65,7 @@ def test_add_task_action_handles_generic_error():
     action = AddTaskAction(tasks_repo, users_repo, statuses_repo)
     response = action.execute(request)
 
-    tasks_repo.save.assert_called_once()
+    assert tasks_repo.save.called
     assert bool(response) is False
     message = 'Exception: {}'.format(error_message)
     assert response.value == {

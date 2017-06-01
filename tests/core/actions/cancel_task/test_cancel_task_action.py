@@ -12,7 +12,7 @@ def test_cancel_task_action():
     response = action.execute(request)
 
     assert bool(response) is True
-    task_repo.update.assert_called_once()
+    assert task_repo.update.called
 
 
 def test_cancel_task_action_handles_bad_request():
@@ -40,7 +40,7 @@ def test_cancel_task_action_handles_generic_error():
     response = action.execute(request)
 
     assert bool(response) is False
-    task_repo.update.assert_called_once()
+    assert task_repo.update.called
     assert response.value == {
         'type': ResponseFailure.SYSTEM_ERROR,
         'message': 'Exception: {}'.format(error_message)

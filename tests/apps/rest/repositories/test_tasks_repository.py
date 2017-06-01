@@ -39,9 +39,9 @@ def setup_function():
     db_session.add(doer)
     db_session.commit()
 
-    status_new = models.TaskStatus(id=Statuses.NEW.value, name='new')
+    status_new = models.TaskStatus(id=Statuses.NEW, name='new')
     status_in_progress = models.TaskStatus(
-        id=Statuses.IN_PROGRESS.value, name='in progress')
+        id=Statuses.IN_PROGRESS, name='in progress')
 
     db_session.add(status_new)
     db_session.add(status_in_progress)

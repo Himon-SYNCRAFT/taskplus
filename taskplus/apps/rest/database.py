@@ -52,13 +52,13 @@ def create_db():
     db_session.add(doer)
     db_session.commit()
 
-    status_new = models.TaskStatus(id=Statuses.NEW.value, name='new')
+    status_new = models.TaskStatus(id=Statuses.NEW, name='new')
     status_in_progress = models.TaskStatus(
-        id=Statuses.IN_PROGRESS.value, name='in progress')
+        id=Statuses.IN_PROGRESS, name='in progress')
     status_completed = models.TaskStatus(
-        id=Statuses.COMPLETED.value, name='completed')
+        id=Statuses.COMPLETED, name='completed')
     status_canceled = models.TaskStatus(
-        id=Statuses.CANCELED.value, name='canceled')
+        id=Statuses.CANCELED, name='canceled')
 
     db_session.add(status_new)
     db_session.add(status_in_progress)

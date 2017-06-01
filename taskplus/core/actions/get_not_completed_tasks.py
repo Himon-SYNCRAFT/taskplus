@@ -9,8 +9,8 @@ class GetNotCompletedTasksRequest(Request):
         super().__init__()
         self.filters = {
             'status_id__notin': [
-                Statuses.CANCELED.value,
-                Statuses.COMPLETED.value
+                Statuses.CANCELED,
+                Statuses.COMPLETED
             ]
         }
 

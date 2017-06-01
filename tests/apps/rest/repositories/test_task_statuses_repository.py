@@ -25,12 +25,12 @@ def setup_function():
     Base.metadata.drop_all(engine)
     Base.metadata.create_all(engine)
 
-    status_new = models.TaskStatus(id=Statuses.NEW.value, name='new')
-    status_in_progress = models.TaskStatus(id=Statuses.IN_PROGRESS.value,
+    status_new = models.TaskStatus(id=Statuses.NEW, name='new')
+    status_in_progress = models.TaskStatus(id=Statuses.IN_PROGRESS,
                                            name='in progress')
-    status_completed = models.TaskStatus(id=Statuses.COMPLETED.value,
+    status_completed = models.TaskStatus(id=Statuses.COMPLETED,
                                          name='completed')
-    status_canceled = models.TaskStatus(id=Statuses.CANCELED.value, name='canceled')
+    status_canceled = models.TaskStatus(id=Statuses.CANCELED, name='canceled')
 
     db_session.add(status_new)
     db_session.add(status_in_progress)
@@ -40,7 +40,7 @@ def setup_function():
 
 
 def test_statuses_repository_one():
-    id = Statuses.NEW.value
+    id = Statuses.NEW
     result = repository.one(id)
 
     assert isinstance(result, DomainModel)
@@ -165,7 +165,7 @@ def test_statuses_repository_save():
 
 
 def test_statuses_repository_delete():
-    id = Statuses.NEW.value
+    id = Statuses.NEW
     result = repository.delete(id)
     statuses = repository.list()
 

@@ -65,7 +65,7 @@ def test_add_task_status_action():
     response = action.execute(request)
 
     assert bool(response) is True
-    statuses_repo.save.assert_called_once()
+    assert statuses_repo.save.called
     assert response.value == statuses_repo.save.return_value
 
 
@@ -96,7 +96,7 @@ def test_add_task_status_action_handles_generic_error():
     response = action.execute(request)
 
     assert bool(response) is False
-    statuses_repo.save.assert_called_once()
+    assert statuses_repo.save.called
     assert response.value == {
         'type': ResponseFailure.SYSTEM_ERROR,
         'message': 'Exception: {}'.format(error_message)
