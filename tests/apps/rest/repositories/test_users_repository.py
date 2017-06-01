@@ -16,7 +16,7 @@ doer_ = user_(id=2, name='doer', role_id=2, role_name='doer_role')
 repository = UsersRepository()
 
 
-def setup_function():
+def setup_function(function):
     if db_session.bind.driver == 'pysqlite':
         @event.listens_for(Engine, "connect")
         def set_sqlite_pragma(dbapi_connection, connection_record):

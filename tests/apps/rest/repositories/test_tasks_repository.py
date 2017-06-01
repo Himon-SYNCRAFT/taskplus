@@ -12,7 +12,7 @@ from taskplus.core.shared.exceptions import NoResultFound
 repository = TasksRepository()
 
 
-def setup_function():
+def setup_function(function):
     if db_session.bind.driver == 'pysqlite':
         @event.listens_for(Engine, "connect")
         def set_sqlite_pragma(dbapi_connection, connection_record):
