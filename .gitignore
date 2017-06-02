@@ -6,3 +6,4 @@ cache/
 *.db
 .tox/
 taskplus.egg-info/
+wsgi.py
