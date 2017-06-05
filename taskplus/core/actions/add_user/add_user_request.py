@@ -3,9 +3,10 @@ from taskplus.core.shared.request import Request
 
 class AddUserRequest(Request):
 
-    def __init__(self, name, role_id):
+    def __init__(self, name, password, role_id):
         super().__init__()
         self.name = name
+        self.password = password
         self.role_id = role_id
         self._validate()
 
@@ -21,6 +22,16 @@ class AddUserRequest(Request):
                 self.name.__class__.__name__, self.name
             )
             self._add_error('name', message)
+
+        if self.password is None:
+            self._add_error('password', 'is required')
+        elif isinstance(self.password, str) and not self.password.strip():
+            self._add_error('password', 'is required')
+        elif not isinstance(self.password, str):
+            message = 'expected str, got {}({})'.format(
+                self.password.__class__.__name__, self.password
+            )
+            self._add_error('password', message)
 
         if not self.role_id:
             self._add_error('role_id', 'is required')

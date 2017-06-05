@@ -1,12 +1,10 @@
 from flask import Flask
-from flask_login import LoginManager
 
 from taskplus.apps.rest import routes
 from taskplus.apps.rest.settings import DevConfig
 from taskplus.apps.rest.database import create_db
-
-
-login_manager = LoginManager()
+from taskplus.apps.rest.auth import login_manager, user_loader, request_loader,\
+                                    unauthorized_handler
 
 
 def create_app(config_object=DevConfig):

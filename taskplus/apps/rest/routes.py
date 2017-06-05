@@ -1,4 +1,6 @@
-from flask import Blueprint
+import flask_login
+from flask_login import login_required
+from flask import Blueprint, jsonify
 from flask import request as http_request
 
 from taskplus.apps.rest.helpers import json_response
@@ -44,7 +46,47 @@ users_repository = UsersRepository()
 tasks_repository = TasksRepository()
 
 
+@blueprint.route('/auth/login', methods=['POST'])
+def login():
+    data = http_request.get_json()
+    name = data['name']
+    password = data['password']
+    request = ListUsersRequest(filters=dict(name=name))
+    action = ListUsersAction(users_repository)
+    response = action.execute(request)
+
+    if not response or not response.value:
+        message = 'Login failed. User with name {} not found.'.format(name)
+        return jsonify(dict(message=message)), 401
+
+    user = response.value[0]
+
+    if not users_repository.check_password(user, password):
+        message = 'Login failed. Invalid password.'
+        return jsonify(dict(message=message)), 401
+
+    user.is_active = True
+    user.is_authenticated = True
+    user.is_anonymous = False
+
+    def get_id():
+        return user.name
+
+    user.get_id = get_id
+
+    flask_login.login_user(user)
+    return json_response(response.value[0], UserEncoder)
+
+
+@blueprint.route('/auth/logout', methods=['GET'])
+def logout():
+    flask_login.logout_user()
+    message = 'Logged out'
+    return jsonify(dict(message=message)), 200
+
+
 @blueprint.route('/roles', methods=['GET'])
+@login_required
 def get_all_user_roles():
     request = ListUserRolesRequest()
     action = ListUserRolesAction(user_roles_repository)
@@ -54,6 +96,7 @@ def get_all_user_roles():
 
 
 @blueprint.route('/roles', methods=['POST'])
+@login_required
 def get_user_roles_by():
     data = http_request.get_json()
     request = ListUserRolesRequest(**data)
@@ -64,6 +107,7 @@ def get_user_roles_by():
 
 
 @blueprint.route('/role/<int:id>', methods=['GET'])
+@login_required
 def get_user_role_details(id):
     request = GetRoleDetailsRequest(id)
     action = GetRoleDetailsAction(user_roles_repository)
@@ -73,6 +117,7 @@ def get_user_role_details(id):
 
 
 @blueprint.route('/role', methods=['POST'])
+@login_required
 def add_user_role():
     data = http_request.get_json()
     request = AddUserRoleRequest(**data)
@@ -83,6 +128,7 @@ def add_user_role():
 
 
 @blueprint.route('/role/<int:id>', methods=['DELETE'])
+@login_required
 def delete_user_role(id):
     request = DeleteUserRoleRequest(id)
     action = DeleteUserRoleAction(user_roles_repository)
@@ -92,6 +138,7 @@ def delete_user_role(id):
 
 
 @blueprint.route('/role', methods=['PUT'])
+@login_required
 def update_user_role():
     data = http_request.get_json()
     request = UpdateUserRoleRequest(**data)
@@ -102,6 +149,7 @@ def update_user_role():
 
 
 @blueprint.route('/statuses', methods=['GET'])
+@login_required
 def get_all_task_statuses():
     request = ListTaskStatusesRequest()
     action = ListTaskStatusesAction(task_statuses_repository)
@@ -111,6 +159,7 @@ def get_all_task_statuses():
 
 
 @blueprint.route('/statuses', methods=['POST'])
+@login_required
 def get_task_statuses_by():
     data = http_request.get_json()
     request = ListTaskStatusesRequest(**data)
@@ -121,6 +170,7 @@ def get_task_statuses_by():
 
 
 @blueprint.route('/status/<int:id>', methods=['GET'])
+@login_required
 def get_task_status_details(id):
     request = GetTaskStatusDetailsRequest(id)
     action = GetTaskStatusDetailsAction(task_statuses_repository)
@@ -130,6 +180,7 @@ def get_task_status_details(id):
 
 
 @blueprint.route('/status', methods=['POST'])
+@login_required
 def add_task_status():
     data = http_request.get_json()
     request = AddTaskStatusRequest(**data)
@@ -140,6 +191,7 @@ def add_task_status():
 
 
 @blueprint.route('/status/<int:id>', methods=['DELETE'])
+@login_required
 def delete_task_status(id):
     request = DeleteTaskStatusRequest(id)
     action = DeleteTaskStatusAction(task_statuses_repository)
@@ -149,6 +201,7 @@ def delete_task_status(id):
 
 
 @blueprint.route('/status', methods=['PUT'])
+@login_required
 def update_task_status():
     data = http_request.get_json()
     request = UpdateTaskStatusRequest(**data)
@@ -159,6 +212,7 @@ def update_task_status():
 
 
 @blueprint.route('/users', methods=['GET'])
+@login_required
 def get_all_users():
     request = ListUsersRequest()
     action = ListUsersAction(users_repository)
@@ -168,6 +222,7 @@ def get_all_users():
 
 
 @blueprint.route('/users', methods=['POST'])
+@login_required
 def get_users_by():
     data = http_request.get_json()
     request = ListUsersRequest(**data)
@@ -178,6 +233,7 @@ def get_users_by():
 
 
 @blueprint.route('/user/<int:id>', methods=['GET'])
+@login_required
 def get_user_details(id):
     request = GetUserDetailsRequest(id)
     action = GetUserDetailsAction(users_repository)
@@ -187,6 +243,7 @@ def get_user_details(id):
 
 
 @blueprint.route('/user', methods=['POST'])
+@login_required
 def add_user():
     data = http_request.get_json()
     request = AddUserRequest(**data)
@@ -197,6 +254,7 @@ def add_user():
 
 
 @blueprint.route('/user/<int:id>', methods=['DELETE'])
+@login_required
 def delete_user(id):
     request = DeleteUserRequest(id)
     action = DeleteUserAction(users_repository)
@@ -206,6 +264,7 @@ def delete_user(id):
 
 
 @blueprint.route('/user', methods=['PUT'])
+@login_required
 def update_user():
     data = http_request.get_json()
     request = UpdateUserRequest(**data)
@@ -216,6 +275,7 @@ def update_user():
 
 
 @blueprint.route('/tasks', methods=['GET'])
+@login_required
 def get_all_tasks():
     request = ListTasksRequest()
     action = ListTasksAction(tasks_repository)
@@ -225,6 +285,7 @@ def get_all_tasks():
 
 
 @blueprint.route('/tasks/notcompleted', methods=['GET'])
+@login_required
 def get_not_completed_tasks():
     request = GetNotCompletedTasksRequest()
     action = GetNotCompletedTasksAction(tasks_repository)
@@ -234,6 +295,7 @@ def get_not_completed_tasks():
 
 
 @blueprint.route('/tasks', methods=['POST'])
+@login_required
 def get_tasks_by():
     data = http_request.get_json()
     request = ListTasksRequest(**data)
@@ -244,6 +306,7 @@ def get_tasks_by():
 
 
 @blueprint.route('/task/<int:id>', methods=['GET'])
+@login_required
 def get_task_details(id):
     request = GetTaskDetailsRequest(id)
     action = GetTaskDetailsAction(tasks_repository)
@@ -253,6 +316,7 @@ def get_task_details(id):
 
 
 @blueprint.route('/task', methods=['POST'])
+@login_required
 def add_task():
     data = http_request.get_json()
     request = AddTaskRequest(**data)
@@ -263,6 +327,7 @@ def add_task():
 
 
 @blueprint.route('/task/<int:id>/cancel', methods=['GET'])
+@login_required
 def cancel_task(id):
     request = CancelTaskRequest(id)
     action = CancelTaskAction(tasks_repository)
@@ -272,6 +337,7 @@ def cancel_task(id):
 
 
 @blueprint.route('/task/<int:id>/complete', methods=['GET'])
+@login_required
 def complete_task(id):
     request = CompleteTaskRequest(id)
     action = CompleteTaskAction(tasks_repository)
@@ -281,6 +347,7 @@ def complete_task(id):
 
 
 @blueprint.route('/task/<int:task_id>/assign/<int:user_id>', methods=['GET'])
+@login_required
 def assing_user_to_task(task_id, user_id):
     request = AssignUserToTaskRequest(task_id=task_id, user_id=user_id)
     action = AssignUserToTaskAction(tasks_repository)
@@ -290,6 +357,7 @@ def assing_user_to_task(task_id, user_id):
 
 
 @blueprint.route('/task/<int:task_id>/unassign', methods=['GET'])
+@login_required
 def unassing_user_from_task(task_id):
     request = UnassignUserFromTaskRequest(task_id=task_id)
     action = UnassignUserFromTaskAction(tasks_repository)

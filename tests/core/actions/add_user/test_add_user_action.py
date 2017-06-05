@@ -7,6 +7,7 @@ from taskplus.core.shared.response import ResponseFailure
 
 def test_add_user_action():
     name = 'name'
+    password = 'password'
     role_id = 1
 
     roles_repo = mock.Mock()
@@ -15,7 +16,7 @@ def test_add_user_action():
     users_repo = mock.Mock()
     users_repo.save.return_value = User(name, roles_repo.one.return_value)
 
-    request = AddUserRequest(name=name, role_id=role_id)
+    request = AddUserRequest(name=name, password=password, role_id=role_id)
     action = AddUserAction(users_repo, roles_repo)
 
     response = action.execute(request)
@@ -27,6 +28,7 @@ def test_add_user_action():
 
 def test_add_user_action_handles_bad_request():
     name = None
+    password = None
     role_id = None
 
     roles_repo = mock.Mock()
@@ -35,7 +37,7 @@ def test_add_user_action_handles_bad_request():
     users_repo = mock.Mock()
     users_repo.save.return_value = User('name', roles_repo.one.return_value)
 
-    request = AddUserRequest(name=name, role_id=role_id)
+    request = AddUserRequest(name=name, password=password, role_id=role_id)
     action = AddUserAction(users_repo, roles_repo)
 
     response = action.execute(request)
@@ -43,7 +45,7 @@ def test_add_user_action_handles_bad_request():
     assert not users_repo.save.called
     assert bool(response) is False
     assert response.value == {
-        'message': 'name: is required\nrole_id: is required',
+        'message': 'name: is required\npassword: is required\nrole_id: is required',
         'type': ResponseFailure.PARAMETER_ERROR
     }
 

@@ -7,6 +7,7 @@ class Config(object):
     APP_DIR = os.path.abspath(os.path.dirname(__file__))  # This directory
     PROJECT_ROOT = os.path.abspath(os.path.join(APP_DIR, os.pardir))
     DB_URI = 'sqlite:///data.db'
+    SECRET_KEY = os.environ.get('SECRET_KEY')
 
 
 class ProdConfig(Config):
@@ -20,6 +21,7 @@ class DevConfig(Config):
     ENV = 'dev'
     DEBUG = True
     DB_URI = 'sqlite:///dev.db'
+    SECRET_KEY = 'DEV_KEY'
 
 
 class TestConfig(Config):
@@ -28,3 +30,5 @@ class TestConfig(Config):
     TESTING = True
     DEBUG = True
     DB_URI = 'sqlite:///'
+    SECRET_KEY = 'TEST_KEY'
+    LOGIN_DISABLED = True

@@ -74,7 +74,7 @@ def test_add_user(mock_action, client):
     response = ResponseSuccess(user)
     mock_action().execute.return_value = response
 
-    data = json.dumps(dict(name=user.name, role_id=1))
+    data = json.dumps(dict(name=user.name, role_id=1, password='password'))
     http_response = client.post('/user', data=data,
                                 content_type='application/json')
 

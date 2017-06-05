@@ -9,7 +9,7 @@ class User(Base):
     __tablename__ = 'users'
 
     id = Column(Integer, primary_key=True)
-    name = Column(String, nullable=False)
+    name = Column(String, nullable=False, unique=True)
     password = Column(String(64), nullable=False)
     role_id = Column(Integer, ForeignKey('user_roles.id'), nullable=False)
 
@@ -48,11 +48,11 @@ class TaskStatus(Base):
     __tablename__ = 'task_statuses'
 
     id = Column(Integer, primary_key=True)
-    name = Column(String, nullable=False)
+    name = Column(String, nullable=False, unique=True)
 
 
 class UserRole(Base):
     __tablename__ = 'user_roles'
 
     id = Column(Integer, primary_key=True)
-    name = Column(String, nullable=False)
+    name = Column(String, nullable=False, unique=True)

@@ -13,5 +13,5 @@ class AddUserAction(Action):
         role = self.roles_repo.one(request.role_id)
         user = User(name=request.name, role=role)
 
-        response = self.users_repo.save(user)
+        response = self.users_repo.save(user, password=request.password)
         return ResponseSuccess(response)
