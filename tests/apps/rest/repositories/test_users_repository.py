@@ -1,4 +1,5 @@
 import pytest
+from unittest import mock
 from collections import namedtuple
 from sqlalchemy import event
 from sqlalchemy.engine import Engine
@@ -16,6 +17,8 @@ doer_ = user_(id=2, name='doer', role_id=2, role_name='doer_role')
 repository = UsersRepository()
 
 
+@mock.patch('taskplus.apps.rest.models.User._hash_password',
+            side_effect=lambda x: x)
 def setup_function(function):
     if db_session.bind.driver == 'pysqlite':
         @event.listens_for(Engine, "connect")
@@ -39,9 +42,9 @@ def setup_function(function):
     db_session.commit()
 
     creator = models.User(name=creator_.name, role_id=creator_role.id,
-                          id=creator_.id)
+                          id=creator_.id, password='pass')
     doer = models.User(name=doer_.name, role_id=doer_role.id,
-                       id=doer_.id)
+                       id=doer_.id, password='pass')
 
     db_session.add(creator)
     db_session.add(doer)
@@ -56,6 +59,7 @@ def test_users_repository_one():
     assert result.name == name
     assert result.role.id == role_id
     assert result.role.name == role_name
+    assert not hasattr(result, 'password')
     assert isinstance(result, DomainModel)
 
 
@@ -82,6 +86,7 @@ def test_users_repository_list():
                 user.role.name == doer_role_name
                 for user in result])
     assert all([isinstance(user, DomainModel) for user in result])
+    assert all([not hasattr(user, 'password') for user in result])
 
 
 def test_users_repository_save():
@@ -91,11 +96,12 @@ def test_users_repository_save():
         name='user',
         role=UserRole(name=creator_role_name, id=creator_role_id)
     )
-    result = repository.save(user)
+    result = repository.save(user, password='pass')
 
     assert result.name == user.name
     assert result.role.id == user.role.id
     assert result.role.name == user.role.name
+    assert not hasattr(result, 'password')
     assert isinstance(result, DomainModel)
 
 
@@ -113,6 +119,7 @@ def test_users_repository_update():
     assert result.name == user.name
     assert result.role.id == user.role.id
     assert result.role.name == user.role.name
+    assert not hasattr(result, 'password')
     assert isinstance(result, DomainModel)
 
 
@@ -192,6 +199,7 @@ def test_users_repository_delete():
 
     result = repository.delete(user_id)
     assert result.id == user_id
+    assert not hasattr(result, 'password')
 
     result = repository.list()
     assert len(result) == 1

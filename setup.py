@@ -45,9 +45,11 @@ setup(
     install_requires=[
         'Flask>=0.12.2',
         'Flask-Script>=2.0.5',
+        'Flask-Login>=0.4.0',
         'SQLAlchemy==1.1.10',
         'pytest-flask>=0.10.0',
         'six',
+        'bcrypt>=3.1.3',
         ],
     cmdclass={'test': PyTest},
     author_email='d.zawlocki@danielzawlocki.pl',

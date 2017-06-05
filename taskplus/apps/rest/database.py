@@ -45,8 +45,9 @@ def create_db():
     db_session.add(doer_role)
     db_session.commit()
 
-    creator = models.User(name='creator', role_id=creator_role.id)
-    doer = models.User(name='doer', role_id=doer_role.id)
+    creator = models.User(name='creator', role_id=creator_role.id,
+                          password='creator')
+    doer = models.User(name='doer', role_id=doer_role.id, password='doer')
 
     db_session.add(creator)
     db_session.add(doer)

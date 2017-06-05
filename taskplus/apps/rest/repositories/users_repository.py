@@ -45,8 +45,9 @@ class UsersRepository(Repository):
 
         return users
 
-    def save(self, user):
-        new_user = self.user_model(name=user.name, role_id=user.role.id)
+    def save(self, user, password):
+        new_user = self.user_model(name=user.name, role_id=user.role.id,
+                                   password=password)
         self.session.add(new_user)
         self.session.commit()
 
@@ -80,3 +81,11 @@ class UsersRepository(Repository):
         self.session.commit()
 
         return User(name=user.name, role=role, id=user.id)
+
+    def check_password(self, user, password):
+        result = self.user_model.query.get(user.id)
+
+        if not result:
+            raise NoResultFound(id, User.__name__)
+
+        return result.check_password(password)

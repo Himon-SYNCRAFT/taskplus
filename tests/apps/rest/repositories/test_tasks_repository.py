@@ -1,4 +1,5 @@
 import pytest
+from unittest import mock
 from sqlalchemy import event
 from sqlalchemy.engine import Engine
 
@@ -12,6 +13,8 @@ from taskplus.core.shared.exceptions import NoResultFound
 repository = TasksRepository()
 
 
+@mock.patch('taskplus.apps.rest.models.User._hash_password',
+            side_effect=lambda x: x)
 def setup_function(function):
     if db_session.bind.driver == 'pysqlite':
         @event.listens_for(Engine, "connect")
@@ -32,8 +35,9 @@ def setup_function(function):
     db_session.add(doer_role)
     db_session.commit()
 
-    creator = models.User(name='creator', role_id=creator_role.id)
-    doer = models.User(name='doer', role_id=doer_role.id)
+    creator = models.User(name='creator', role_id=creator_role.id,
+                          password='pass')
+    doer = models.User(name='doer', role_id=doer_role.id, password='pass')
 
     db_session.add(creator)
     db_session.add(doer)
