@@ -17,8 +17,6 @@ doer_ = user_(id=2, name='doer', role_id=2, role_name='doer_role')
 repository = UsersRepository()
 
 
-@mock.patch('taskplus.apps.rest.models.User._hash_password',
-            side_effect=lambda x: x)
 def setup_function(function):
     if db_session.bind.driver == 'pysqlite':
         @event.listens_for(Engine, "connect")
@@ -27,28 +25,30 @@ def setup_function(function):
             cursor.execute("PRAGMA foreign_keys=ON")
             cursor.close()
 
-    from taskplus.apps.rest import models
-    Base.metadata.reflect(engine)
-    Base.metadata.drop_all(engine)
-    Base.metadata.create_all(engine)
+    with mock.patch('taskplus.apps.rest.models.User._hash_password',
+                    side_effect=lambda x: x):
+        from taskplus.apps.rest import models
+        Base.metadata.reflect(engine)
+        Base.metadata.drop_all(engine)
+        Base.metadata.create_all(engine)
 
-    creator_role = models.UserRole(name=creator_.role_name,
-                                   id=creator_.role_id)
-    doer_role = models.UserRole(name=doer_.role_name,
-                                id=doer_.role_id)
+        creator_role = models.UserRole(name=creator_.role_name,
+                                       id=creator_.role_id)
+        doer_role = models.UserRole(name=doer_.role_name,
+                                    id=doer_.role_id)
 
-    db_session.add(creator_role)
-    db_session.add(doer_role)
-    db_session.commit()
+        db_session.add(creator_role)
+        db_session.add(doer_role)
+        db_session.commit()
 
-    creator = models.User(name=creator_.name, role_id=creator_role.id,
-                          id=creator_.id, password='pass')
-    doer = models.User(name=doer_.name, role_id=doer_role.id,
-                       id=doer_.id, password='pass')
+        creator = models.User(name=creator_.name, role_id=creator_role.id,
+                              id=creator_.id, password='pass')
+        doer = models.User(name=doer_.name, role_id=doer_role.id,
+                           id=doer_.id, password='pass')
 
-    db_session.add(creator)
-    db_session.add(doer)
-    db_session.commit()
+        db_session.add(creator)
+        db_session.add(doer)
+        db_session.commit()
 
 
 def test_users_repository_one():

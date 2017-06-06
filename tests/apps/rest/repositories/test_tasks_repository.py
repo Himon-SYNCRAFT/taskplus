@@ -13,8 +13,6 @@ from taskplus.core.shared.exceptions import NoResultFound
 repository = TasksRepository()
 
 
-@mock.patch('taskplus.apps.rest.models.User._hash_password',
-            side_effect=lambda x: x)
 def setup_function(function):
     if db_session.bind.driver == 'pysqlite':
         @event.listens_for(Engine, "connect")
@@ -23,44 +21,46 @@ def setup_function(function):
             cursor.execute("PRAGMA foreign_keys=ON")
             cursor.close()
 
-    from taskplus.apps.rest import models
-    Base.metadata.reflect(engine)
-    Base.metadata.drop_all(engine)
-    Base.metadata.create_all(engine)
+    with mock.patch('taskplus.apps.rest.models.User._hash_password',
+                    side_effect=lambda x: x):
+        from taskplus.apps.rest import models
+        Base.metadata.reflect(engine)
+        Base.metadata.drop_all(engine)
+        Base.metadata.create_all(engine)
 
-    creator_role = models.UserRole(name='creator_role')
-    doer_role = models.UserRole(name='doer_role')
+        creator_role = models.UserRole(name='creator_role')
+        doer_role = models.UserRole(name='doer_role')
 
-    db_session.add(creator_role)
-    db_session.add(doer_role)
-    db_session.commit()
+        db_session.add(creator_role)
+        db_session.add(doer_role)
+        db_session.commit()
 
-    creator = models.User(name='creator', role_id=creator_role.id,
-                          password='pass')
-    doer = models.User(name='doer', role_id=doer_role.id, password='pass')
+        creator = models.User(name='creator', role_id=creator_role.id,
+                              password='pass')
+        doer = models.User(name='doer', role_id=doer_role.id, password='pass')
 
-    db_session.add(creator)
-    db_session.add(doer)
-    db_session.commit()
+        db_session.add(creator)
+        db_session.add(doer)
+        db_session.commit()
 
-    status_new = models.TaskStatus(id=Statuses.NEW, name='new')
-    status_in_progress = models.TaskStatus(
-        id=Statuses.IN_PROGRESS, name='in progress')
+        status_new = models.TaskStatus(id=Statuses.NEW, name='new')
+        status_in_progress = models.TaskStatus(
+            id=Statuses.IN_PROGRESS, name='in progress')
 
-    db_session.add(status_new)
-    db_session.add(status_in_progress)
-    db_session.commit()
+        db_session.add(status_new)
+        db_session.add(status_in_progress)
+        db_session.commit()
 
-    task = models.Task(name='example task 1', content='lorem ipsum',
-                       status_id=status_new.id, creator_id=creator.id,
-                       doer_id=doer.id)
-    task2 = models.Task(name='example task 2', content='lorem ipsum 2',
-                        status_id=status_new.id, creator_id=creator.id,
-                        doer_id=doer.id)
+        task = models.Task(name='example task 1', content='lorem ipsum',
+                           status_id=status_new.id, creator_id=creator.id,
+                           doer_id=doer.id)
+        task2 = models.Task(name='example task 2', content='lorem ipsum 2',
+                            status_id=status_new.id, creator_id=creator.id,
+                            doer_id=doer.id)
 
-    db_session.add(task)
-    db_session.add(task2)
-    db_session.commit()
+        db_session.add(task)
+        db_session.add(task2)
+        db_session.commit()
 
 
 def test_tasks_repository_one():
