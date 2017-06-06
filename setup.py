@@ -41,13 +41,18 @@ setup(
     url='https://github.com/Himon-SYNCRAFT/taskplus',
     license='BSD',
     author='Daniel Zawlocki',
-    tests_require=['pytest', 'pytest-cov', 'coverage', 'six', 'pytest-flask'],
+    tests_require=[
+        'pytest==3.1.1'
+        'pytest-cov',
+        'coverage',
+        'six',
+        'pytest-flask>=0.10.0',
+    ],
     install_requires=[
         'Flask>=0.12.2',
         'Flask-Script>=2.0.5',
         'Flask-Login>=0.4.0',
         'SQLAlchemy==1.1.10',
-        'pytest-flask>=0.10.0',
         'six',
         'bcrypt>=3.1.3',
         ],
