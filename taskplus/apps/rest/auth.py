@@ -1,4 +1,5 @@
 from flask_login import LoginManager
+from flask import jsonify
 
 from taskplus.core.actions import ListUsersAction, ListUsersRequest
 from taskplus.apps.rest.repositories import UsersRepository
@@ -50,4 +51,5 @@ def request_loader(request):
 
 @login_manager.unauthorized_handler
 def unauthorized_handler():
-    return 'Unauthorized', 401
+    message = 'Unauthorized'
+    return jsonify(dict(message=message)), 401
