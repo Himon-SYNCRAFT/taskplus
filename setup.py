@@ -52,6 +52,7 @@ setup(
         'Flask>=0.12.2',
         'Flask-Script>=2.0.5',
         'Flask-Login>=0.4.0',
+        'Flask-Cors>=3.0.2',
         'SQLAlchemy==1.1.10',
         'pytest-flask>=0.10.0',
         'six',
