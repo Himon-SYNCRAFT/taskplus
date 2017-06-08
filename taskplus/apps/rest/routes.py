@@ -350,7 +350,7 @@ def complete_task(id):
 @login_required
 def assing_user_to_task(task_id, user_id):
     request = AssignUserToTaskRequest(task_id=task_id, user_id=user_id)
-    action = AssignUserToTaskAction(tasks_repository)
+    action = AssignUserToTaskAction(tasks_repository, users_repository)
     response = action.execute(request)
 
     return json_response(response.value, TaskEncoder)
