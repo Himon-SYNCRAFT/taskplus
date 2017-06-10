@@ -38,7 +38,7 @@ class TasksRepository(Repository):
         task_to_update.creator_id = task.creator.id
 
         if not task.doer:
-            task.doer_id = None
+            task_to_update.doer = None
         else:
             task_to_update.doer_id = task.doer.id
 

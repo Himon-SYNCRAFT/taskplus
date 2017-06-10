@@ -9,7 +9,7 @@ class UnassignUserFromTaskAction(Action):
 
     def process_request(self, request):
         task_id = request.task_id
-        task = self.tasks_repo.get(task_id)
+        task = self.tasks_repo.one(task_id)
 
         task.doer = None
         response = self.tasks_repo.update(task)
