@@ -11,8 +11,8 @@ class AddTaskAction(Action):
         self.statuses_repo = statuses_repo
 
     def process_request(self, request):
-        creator = self.users_repo.get(request.creator_id)
-        status = self.statuses_repo.get(Statuses.NEW)
+        creator = self.users_repo.one(request.creator_id)
+        status = self.statuses_repo.one(Statuses.NEW)
 
         task = Task(name=request.name,
                     content=request.content,
