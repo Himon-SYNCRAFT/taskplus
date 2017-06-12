@@ -1,93 +1,38 @@
-from taskplus.core.actions.add_user_role.add_user_role_action\
-     import AddUserRoleAction
-from taskplus.core.actions.add_user_role.add_user_role_request\
-     import AddUserRoleRequest
+from taskplus.core.actions.add_user_role import AddUserRoleAction, AddUserRoleRequest
 
-from taskplus.core.actions.delete_user_role.delete_user_role_action\
-     import DeleteUserRoleAction
-from taskplus.core.actions.delete_user_role.delete_user_role_request\
-     import DeleteUserRoleRequest
+from taskplus.core.actions.delete_user_role import DeleteUserRoleAction, DeleteUserRoleRequest
 
-from taskplus.core.actions.list_user_roles.list_user_roles_action\
-     import ListUserRolesAction
-from taskplus.core.actions.list_user_roles.list_user_roles_request\
-     import ListUserRolesRequest
+from taskplus.core.actions.list_user_roles import ListUserRolesAction, ListUserRolesRequest
 
-from taskplus.core.actions.update_user_role.update_user_role_action\
-     import UpdateUserRoleAction
-from taskplus.core.actions.update_user_role.update_user_role_request\
-     import UpdateUserRoleRequest
+from taskplus.core.actions.update_user_role import UpdateUserRoleAction, UpdateUserRoleRequest
 
-from taskplus.core.actions.add_user.add_user_request\
-     import AddUserRequest
-from taskplus.core.actions.add_user.add_user_action\
-     import AddUserAction
+from taskplus.core.actions.add_user import AddUserRequest, AddUserAction
 
-from taskplus.core.actions.list_users.list_users_request\
-     import ListUsersRequest
-from taskplus.core.actions.list_users.list_users_action\
-     import ListUsersAction
+from taskplus.core.actions.list_users import ListUsersRequest, ListUsersAction
 
-from taskplus.core.actions.update_user.update_user_action\
-     import UpdateUserAction
-from taskplus.core.actions.update_user.update_user_request\
-     import UpdateUserRequest
+from taskplus.core.actions.update_user import UpdateUserAction, UpdateUserRequest
 
-from taskplus.core.actions.delete_user.delete_user_action\
-     import DeleteUserAction
-from taskplus.core.actions.delete_user.delete_user_request\
-     import DeleteUserRequest
+from taskplus.core.actions.delete_user import DeleteUserAction, DeleteUserRequest
 
-from taskplus.core.actions.add_task.add_task_action\
-     import AddTaskAction
-from taskplus.core.actions.add_task.add_task_request\
-     import AddTaskRequest
+from taskplus.core.actions.add_task import AddTaskAction, AddTaskRequest
 
-from taskplus.core.actions.cancel_task.cancel_task_action\
-     import CancelTaskAction
-from taskplus.core.actions.cancel_task.cancel_task_request\
-     import CancelTaskRequest
+from taskplus.core.actions.cancel_task import CancelTaskAction, CancelTaskRequest
 
-from taskplus.core.actions.complete_task.complete_task_action\
-     import CompleteTaskAction
-from taskplus.core.actions.complete_task.complete_task_request\
-     import CompleteTaskRequest
+from taskplus.core.actions.complete_task import CompleteTaskAction, CompleteTaskRequest
 
-from taskplus.core.actions.assign_user_to_task.assign_user_to_task_action\
-     import AssignUserToTaskAction
-from taskplus.core.actions.assign_user_to_task.assign_user_to_task_request\
-     import AssignUserToTaskRequest
+from taskplus.core.actions.assign_user_to_task import AssignUserToTaskAction, AssignUserToTaskRequest
 
-from taskplus.core.actions.unassign_user_from_task.unassign_user_from_task_action\
-     import UnassignUserFromTaskAction
-from taskplus.core.actions.unassign_user_from_task.unassign_user_from_task_request\
-     import UnassignUserFromTaskRequest
+from taskplus.core.actions.unassign_user_from_task import UnassignUserFromTaskAction, UnassignUserFromTaskRequest
 
-from taskplus.core.actions.get_user_details.get_user_details_action\
-     import GetUserDetailsAction
-from taskplus.core.actions.get_user_details.get_user_details_request\
-     import GetUserDetailsRequest
+from taskplus.core.actions.get_user_details import GetUserDetailsAction, GetUserDetailsRequest
 
-from taskplus.core.actions.get_role_details.get_role_details_action\
-     import GetRoleDetailsAction
-from taskplus.core.actions.get_role_details.get_role_details_request\
-     import GetRoleDetailsRequest
+from taskplus.core.actions.get_role_details import GetRoleDetailsAction, GetRoleDetailsRequest
 
-from taskplus.core.actions.get_task_details.get_task_details_action\
-     import GetTaskDetailsAction
-from taskplus.core.actions.get_task_details.get_task_details_request\
-     import GetTaskDetailsRequest
+from taskplus.core.actions.get_task_details import GetTaskDetailsAction, GetTaskDetailsRequest
 
+from taskplus.core.actions.list_tasks import ListTasksRequest, ListTasksAction
 
-from taskplus.core.actions.list_tasks.list_tasks_request\
-     import ListTasksRequest
-from taskplus.core.actions.list_tasks.list_tasks_action\
-     import ListTasksAction
-
-from taskplus.core.actions.list_task_statuses.list_task_statuses_request\
-     import ListTaskStatusesRequest
-from taskplus.core.actions.list_task_statuses.list_task_statuses_action\
-     import ListTaskStatusesAction
+from taskplus.core.actions.list_task_statuses import ListTaskStatusesRequest, ListTaskStatusesAction
 
 from taskplus.core.actions.add_task_status import AddTaskStatusAction, AddTaskStatusRequest
 
@@ -96,4 +41,5 @@ from taskplus.core.actions.get_task_status_details import GetTaskStatusDetailsAc
 from taskplus.core.actions.delete_task_status import DeleteTaskStatusAction, DeleteTaskStatusRequest
 
 from taskplus.core.actions.update_task_status import UpdateTaskStatusAction, UpdateTaskStatusRequest
+
 from taskplus.core.actions.get_not_completed_tasks import GetNotCompletedTasksAction, GetNotCompletedTasksRequest
