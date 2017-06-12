@@ -8,8 +8,8 @@ def test_task():
     task_name = 'example name'
     task_content = 'lorem ipsum'
     task_status = TaskStatus(name='new', id=1)
-    task_creator = User(name='creator', role=role_creator)
-    task_doer = User(name='doer', role=role_doer)
+    task_creator = User(name='creator', roles=[role_creator])
+    task_doer = User(name='doer', roles=[role_doer])
     task_id = 1
 
     task = Task(name=task_name, content=task_content, status=task_status,

@@ -9,8 +9,8 @@ from taskplus.core.shared.response import ResponseFailure
 @pytest.fixture
 def users():
     return [
-        User('name1', role=mock.Mock()),
-        User('name2', role=mock.Mock()),
+        User('name1', roles=mock.Mock()),
+        User('name2', roles=mock.Mock()),
     ]
 
 

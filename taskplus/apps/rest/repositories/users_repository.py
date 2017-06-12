@@ -17,8 +17,7 @@ class UsersRepository(Repository):
         if not result:
             raise NoResultFound(id, User.__name__)
 
-        role = UserRole(id=result.role.id, name=result.role.name)
-        return User(name=result.name, role=role, id=result.id)
+        return self._to_domain_model(result)
 
     def list(self, filters=None):
         if not filters:
@@ -35,24 +34,19 @@ class UsersRepository(Repository):
 
             result = self.user_model.query.filter(*filters_expression).all()
 
-        users = []
-
-        for r in result:
-            role = UserRole(id=r.role.id, name=r.role.name)
-            user = User(name=r.name, role=role, id=r.id)
-
-            users.append(user)
+        users = [self._to_domain_model(user) for user in result]
 
         return users
 
     def save(self, user, password):
-        new_user = self.user_model(name=user.name, role_id=user.role.id,
-                                   password=password)
+        roles = models.UserRole.query.filter(
+            models.UserRole.id.in_([role.id for role in user.roles])).all()
+
+        new_user = self.user_model(name=user.name, roles=roles, password=password)
         self.session.add(new_user)
         self.session.commit()
 
-        role = UserRole(id=new_user.role.id, name=new_user.role.name)
-        return User(name=new_user.name, role=role, id=new_user.id)
+        return self._to_domain_model(new_user)
 
     def update(self, user):
         user_to_update = self.user_model.query.get(user.id)
@@ -60,14 +54,16 @@ class UsersRepository(Repository):
         if not user_to_update:
             raise NoResultFound(user.id, User.__name__)
 
+        roles = models.UserRole.query.filter(
+            models.UserRole.id.in_([role.id for role in user.roles])).all()
+
         user_to_update.name = user.name
-        user_to_update.role_id = user.role.id
+        user_to_update.roles = roles
 
         self.session.add(user_to_update)
         self.session.commit()
 
-        role = UserRole(id=user_to_update.role.id, name=user_to_update.role.name)
-        return User(name=user_to_update.name, role=role, id=user_to_update.id)
+        return self._to_domain_model(user_to_update)
 
     def delete(self, id):
         user = self.user_model.query.get(id)
@@ -75,12 +71,20 @@ class UsersRepository(Repository):
         if not user:
             raise NoResultFound(id, User.__name__)
 
-        role = UserRole(id=user.role.id, name=user.role.name)
+        rv = self._to_domain_model(user)
 
         self.session.delete(user)
         self.session.commit()
 
-        return User(name=user.name, role=role, id=user.id)
+        return rv
+
+    def _to_domain_model(self, data):
+        return User(
+            id=data.id,
+            name=data.name,
+            roles=[UserRole(id=role.id, name=role.name)
+                   for role in data.roles]
+        )
 
     def check_password(self, user, password):
         result = self.user_model.query.get(user.id)

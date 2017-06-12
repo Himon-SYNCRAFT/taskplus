@@ -10,8 +10,9 @@ class AddUserAction(Action):
         self.roles_repo = roles_repo
 
     def process_request(self, request):
-        role = self.roles_repo.one(request.role_id)
-        user = User(name=request.name, role=role)
+        roles = self.roles_repo.list(
+            dict(id_in=request.roles))
+        user = User(name=request.name, roles=roles)
 
         response = self.users_repo.save(user, password=request.password)
         return ResponseSuccess(response)

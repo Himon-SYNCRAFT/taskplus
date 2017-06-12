@@ -6,8 +6,8 @@ from taskplus.core.shared.response import ResponseFailure
 
 
 def test_get_user_details_action():
-    role = mock.Mock()
-    user = User(name='admin', id=1, role=role)
+    roles = mock.Mock()
+    user = User(name='admin', id=1, roles=roles)
     users_repo = mock.Mock()
     users_repo.one.return_value = user
     request = GetUserDetailsRequest(user.id)
@@ -21,8 +21,8 @@ def test_get_user_details_action():
 
 
 def test_get_user_details_action_handles_bad_request():
-    role = mock.Mock()
-    user = User(name='admin', id=1, role=role)
+    roles = mock.Mock()
+    user = User(name='admin', id=1, roles=roles)
     users_repo = mock.Mock()
     users_repo.one.return_value = user
     request = GetUserDetailsRequest(user_id=None)

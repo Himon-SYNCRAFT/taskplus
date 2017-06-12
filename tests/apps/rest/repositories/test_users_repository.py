@@ -41,9 +41,9 @@ def setup_function(function):
         db_session.add(doer_role)
         db_session.commit()
 
-        creator = models.User(name=creator_.name, role_id=creator_role.id,
+        creator = models.User(name=creator_.name, roles=[creator_role],
                               id=creator_.id, password='pass')
-        doer = models.User(name=doer_.name, role_id=doer_role.id,
+        doer = models.User(name=doer_.name, roles=[doer_role],
                            id=doer_.id, password='pass')
 
         db_session.add(creator)
@@ -57,8 +57,8 @@ def test_users_repository_one():
 
     assert result.id == id
     assert result.name == name
-    assert result.role.id == role_id
-    assert result.role.name == role_name
+    assert result.roles[0].id == role_id
+    assert result.roles[0].name == role_name
     assert not hasattr(result, 'password')
     assert isinstance(result, DomainModel)
 
@@ -77,13 +77,13 @@ def test_users_repository_list():
     assert len(result) == 2
     assert any([user.id == creator_id and
                 user.name == creator_name and
-                user.role.id == creator_role_id and
-                user.role.name == creator_role_name
+                user.roles[0].id == creator_role_id and
+                user.roles[0].name == creator_role_name
                 for user in result])
     assert any([user.id == doer_id and
                 user.name == doer_name and
-                user.role.id == doer_role_id and
-                user.role.name == doer_role_name
+                user.roles[0].id == doer_role_id and
+                user.roles[0].name == doer_role_name
                 for user in result])
     assert all([isinstance(user, DomainModel) for user in result])
     assert all([not hasattr(user, 'password') for user in result])
@@ -94,13 +94,13 @@ def test_users_repository_save():
 
     user = User(
         name='user',
-        role=UserRole(name=creator_role_name, id=creator_role_id)
+        roles=[UserRole(name=creator_role_name, id=creator_role_id)]
     )
     result = repository.save(user, password='pass')
 
     assert result.name == user.name
-    assert result.role.id == user.role.id
-    assert result.role.name == user.role.name
+    assert result.roles[0].id == user.roles[0].id
+    assert result.roles[0].name == user.roles[0].name
     assert not hasattr(result, 'password')
     assert isinstance(result, DomainModel)
 
@@ -110,15 +110,15 @@ def test_users_repository_update():
 
     user = User(
         name='user',
-        role=UserRole(name=creator_role_name, id=creator_role_id),
+        roles=[UserRole(name=creator_role_name, id=creator_role_id)],
         id=1
     )
     result = repository.update(user)
 
     assert result.id == user.id
     assert result.name == user.name
-    assert result.role.id == user.role.id
-    assert result.role.name == user.role.name
+    assert result.roles[0].id == user.roles[0].id
+    assert result.roles[0].name == user.roles[0].name
     assert not hasattr(result, 'password')
     assert isinstance(result, DomainModel)
 

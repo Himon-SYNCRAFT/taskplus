@@ -8,8 +8,8 @@ from taskplus.core.domain import User, UserRole, Task, TaskStatus, Statuses
 
 doer_role = UserRole(name='doer_role', id=2)
 creator_role = UserRole(name='creator_role', id=1)
-creator = User(name='creator', role=creator_role, id=1)
-doer = User(name='doer', role=doer_role, id=2)
+creator = User(name='creator', roles=[creator_role], id=1)
+doer = User(name='doer', roles=[doer_role], id=2)
 status_new = TaskStatus(id=Statuses.NEW, name='new')
 
 
@@ -38,6 +38,9 @@ def test_get_tasks_list(mock_action, client, task, tasks):
     mock_action().execute.return_value = response
 
     http_response = client.get('/tasks')
+    doer_roles = [{'id': role.id, 'name': role.name} for role in task.doer.roles]
+    creator_roles = [
+        {'id': role.id, 'name': role.name} for role in task.creator.roles]
 
     assert json.loads(http_response.data.decode('UTF-8')) == [{
         'name': task.name,
@@ -50,18 +53,12 @@ def test_get_tasks_list(mock_action, client, task, tasks):
         'doer': {
             'id': task.doer.id,
             'name': task.doer.name,
-            'role': {
-                'id': task.doer.role.id,
-                'name': task.doer.role.name,
-            }
+            'roles': doer_roles
         },
         'creator': {
             'id': task.creator.id,
             'name': task.creator.name,
-            'role': {
-                'id': task.creator.role.id,
-                'name': task.creator.role.name,
-            }
+            'roles': creator_roles
         },
     }]
     assert http_response.status_code == 200
@@ -74,6 +71,10 @@ def test_get_not_completed_tasks(mock_action, client, task, tasks):
     mock_action().execute.return_value = response
 
     http_response = client.get('/tasks/notcompleted')
+    doer_roles = [
+        {'id': role.id, 'name': role.name} for role in task.doer.roles]
+    creator_roles = [
+        {'id': role.id, 'name': role.name} for role in task.creator.roles]
 
     assert json.loads(http_response.data.decode('UTF-8')) == [{
         'name': task.name,
@@ -86,18 +87,12 @@ def test_get_not_completed_tasks(mock_action, client, task, tasks):
         'doer': {
             'id': task.doer.id,
             'name': task.doer.name,
-            'role': {
-                'id': task.doer.role.id,
-                'name': task.doer.role.name,
-            }
+            'roles': doer_roles
         },
         'creator': {
             'id': task.creator.id,
             'name': task.creator.name,
-            'role': {
-                'id': task.creator.role.id,
-                'name': task.creator.role.name,
-            }
+            'roles': creator_roles
         },
     }]
     assert http_response.status_code == 200
@@ -112,6 +107,10 @@ def test_get_tasks_list_with_filters(mock_action, client, task, tasks):
     data = json.dumps(dict(filters=dict(name=task.name)))
     http_response = client.post('/tasks', data=data,
                                 content_type='application/json')
+    doer_roles = [
+        {'id': role.id, 'name': role.name} for role in task.doer.roles]
+    creator_roles = [
+        {'id': role.id, 'name': role.name} for role in task.creator.roles]
 
     assert json.loads(http_response.data.decode('UTF-8')) == [{
         'name': task.name,
@@ -124,18 +123,12 @@ def test_get_tasks_list_with_filters(mock_action, client, task, tasks):
         'doer': {
             'id': task.doer.id,
             'name': task.doer.name,
-            'role': {
-                'id': task.doer.role.id,
-                'name': task.doer.role.name,
-            }
+            'roles': doer_roles
         },
         'creator': {
             'id': task.creator.id,
             'name': task.creator.name,
-            'role': {
-                'id': task.creator.role.id,
-                'name': task.creator.role.name,
-            }
+            'roles': creator_roles
         },
     }]
     assert http_response.status_code == 200
@@ -148,6 +141,10 @@ def test_get_task_details(mock_action, client, task, tasks):
     mock_action().execute.return_value = response
 
     http_response = client.get('/task/{}'.format(task.id))
+    doer_roles = [
+        {'id': role.id, 'name': role.name} for role in task.doer.roles]
+    creator_roles = [
+        {'id': role.id, 'name': role.name} for role in task.creator.roles]
 
     assert json.loads(http_response.data.decode('UTF-8')) == {
         'name': task.name,
@@ -160,18 +157,12 @@ def test_get_task_details(mock_action, client, task, tasks):
         'doer': {
             'id': task.doer.id,
             'name': task.doer.name,
-            'role': {
-                'id': task.doer.role.id,
-                'name': task.doer.role.name,
-            }
+            'roles': doer_roles
         },
         'creator': {
             'id': task.creator.id,
             'name': task.creator.name,
-            'role': {
-                'id': task.creator.role.id,
-                'name': task.creator.role.name,
-            }
+            'roles': creator_roles
         },
     }
     assert http_response.status_code == 200
@@ -187,6 +178,9 @@ def test_add_task(mock_action, client, task, tasks):
                            creator_id=creator.id))
     http_response = client.post('/task', data=data,
                                 content_type='application/json')
+    doer_roles = [{'id': role.id, 'name': role.name} for role in task.doer.roles]
+    creator_roles = [
+        {'id': role.id, 'name': role.name} for role in task.creator.roles]
 
     assert json.loads(http_response.data.decode('UTF-8')) == {
         'name': task.name,
@@ -199,18 +193,12 @@ def test_add_task(mock_action, client, task, tasks):
         'doer': {
             'id': task.doer.id,
             'name': task.doer.name,
-            'role': {
-                'id': task.doer.role.id,
-                'name': task.doer.role.name,
-            }
+            'roles': doer_roles
         },
         'creator': {
             'id': task.creator.id,
             'name': task.creator.name,
-            'role': {
-                'id': task.creator.role.id,
-                'name': task.creator.role.name,
-            }
+            'roles': creator_roles
         },
     }
     assert http_response.status_code == 200
@@ -224,6 +212,9 @@ def test_cancel_task(mock_action, client, task, tasks):
     mock_action().execute.return_value = response
 
     http_response = client.get('/task/{}/cancel'.format(task.id))
+    doer_roles = [{'id': role.id, 'name': role.name} for role in task.doer.roles]
+    creator_roles = [
+        {'id': role.id, 'name': role.name} for role in task.creator.roles]
 
     assert json.loads(http_response.data.decode('UTF-8')) == {
         'name': task.name,
@@ -236,18 +227,12 @@ def test_cancel_task(mock_action, client, task, tasks):
         'doer': {
             'id': task.doer.id,
             'name': task.doer.name,
-            'role': {
-                'id': task.doer.role.id,
-                'name': task.doer.role.name,
-            }
+            'roles': doer_roles
         },
         'creator': {
             'id': task.creator.id,
             'name': task.creator.name,
-            'role': {
-                'id': task.creator.role.id,
-                'name': task.creator.role.name,
-            }
+            'roles': creator_roles
         },
     }
     assert http_response.status_code == 200
@@ -261,6 +246,9 @@ def test_completed_task(mock_action, client, task, tasks):
     mock_action().execute.return_value = response
 
     http_response = client.get('/task/{}/complete'.format(task.id))
+    doer_roles = [{'id': role.id, 'name': role.name} for role in task.doer.roles]
+    creator_roles = [
+        {'id': role.id, 'name': role.name} for role in task.creator.roles]
 
     assert json.loads(http_response.data.decode('UTF-8')) == {
         'name': task.name,
@@ -273,18 +261,12 @@ def test_completed_task(mock_action, client, task, tasks):
         'doer': {
             'id': task.doer.id,
             'name': task.doer.name,
-            'role': {
-                'id': task.doer.role.id,
-                'name': task.doer.role.name,
-            }
+            'roles': doer_roles
         },
         'creator': {
             'id': task.creator.id,
             'name': task.creator.name,
-            'role': {
-                'id': task.creator.role.id,
-                'name': task.creator.role.name,
-            }
+            'roles': creator_roles
         },
     }
     assert http_response.status_code == 200
@@ -293,12 +275,15 @@ def test_completed_task(mock_action, client, task, tasks):
 
 @mock.patch('taskplus.apps.rest.routes.AssignUserToTaskAction')
 def test_assign_user_to_task(mock_action, client, task, tasks):
-    task.doer = User(id=3, name='test', role=doer_role)
+    task.doer = User(id=3, name='test', roles=[doer_role])
     response = ResponseSuccess(task)
     mock_action().execute.return_value = response
 
     http_response = client.get('/task/{}/assign/{}'.format(task.id,
                                                            task.doer.id))
+    doer_roles = [{'id': role.id, 'name': role.name} for role in task.doer.roles]
+    creator_roles = [
+        {'id': role.id, 'name': role.name} for role in task.creator.roles]
 
     assert json.loads(http_response.data.decode('UTF-8')) == {
         'name': task.name,
@@ -311,18 +296,12 @@ def test_assign_user_to_task(mock_action, client, task, tasks):
         'doer': {
             'id': task.doer.id,
             'name': task.doer.name,
-            'role': {
-                'id': task.doer.role.id,
-                'name': task.doer.role.name,
-            }
+            'roles': doer_roles
         },
         'creator': {
             'id': task.creator.id,
             'name': task.creator.name,
-            'role': {
-                'id': task.creator.role.id,
-                'name': task.creator.role.name,
-            }
+            'roles': creator_roles
         },
     }
     assert http_response.status_code == 200
@@ -336,6 +315,8 @@ def test_unassign_user_to_task(mock_action, client, task, tasks):
     mock_action().execute.return_value = response
 
     http_response = client.get('/task/{}/unassign'.format(task.id))
+    creator_roles = [
+        {'id': role.id, 'name': role.name} for role in task.creator.roles]
 
     assert json.loads(http_response.data.decode('UTF-8')) == {
         'name': task.name,
@@ -349,10 +330,7 @@ def test_unassign_user_to_task(mock_action, client, task, tasks):
         'creator': {
             'id': task.creator.id,
             'name': task.creator.name,
-            'role': {
-                'id': task.creator.role.id,
-                'name': task.creator.role.name,
-            }
+            'roles': creator_roles
         },
     }
     assert http_response.status_code == 200

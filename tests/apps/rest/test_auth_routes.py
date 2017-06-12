@@ -6,7 +6,7 @@ from taskplus.core.domain import User, UserRole
 
 
 user_name = 'admin'
-user = User(name=user_name, id=1, role=UserRole(id=1, name='creator'))
+user = User(name=user_name, id=1, roles=[UserRole(id=1, name='creator')])
 users = [user]
 
 
@@ -24,10 +24,10 @@ def test_login(mock_action, repo, client):
     assert json.loads(http_response.data.decode('UTF-8')) == {
         'name': user.name,
         'id': user.id,
-        'role': {
-            'id': user.role.id,
-            'name': user.role.name,
-        }
+        'roles': [{
+            'id': user.roles[0].id,
+            'name': user.roles[0].name,
+        }]
     }
     assert http_response.status_code == 200
     assert http_response.mimetype == 'application/json'

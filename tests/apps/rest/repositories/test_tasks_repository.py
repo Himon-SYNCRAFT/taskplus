@@ -35,9 +35,9 @@ def setup_function(function):
         db_session.add(doer_role)
         db_session.commit()
 
-        creator = models.User(name='creator', role_id=creator_role.id,
+        creator = models.User(name='creator', roles=[creator_role],
                               password='pass')
-        doer = models.User(name='doer', role_id=doer_role.id, password='pass')
+        doer = models.User(name='doer', roles=[doer_role], password='pass')
 
         db_session.add(creator)
         db_session.add(doer)
@@ -70,9 +70,9 @@ def test_tasks_repository_one():
     assert task.id == task_id
     assert task.content == 'lorem ipsum'
     assert task.creator.name == 'creator'
-    assert task.creator.role.name == 'creator_role'
+    assert task.creator.roles[0].name == 'creator_role'
     assert task.doer.name == 'doer'
-    assert task.doer.role.name == 'doer_role'
+    assert task.doer.roles[0].name == 'doer_role'
     assert task.status.name == 'new'
     assert isinstance(task, DomainModel)
 
@@ -293,7 +293,7 @@ def test_tasks_repository_save():
         name=task_name,
         content=task_content,
         status=TaskStatus(id=1, name='new'),
-        creator=User(id=1, name='creator', role=UserRole(id=1, name='creator')),
+        creator=User(id=1, name='creator', roles=[UserRole(id=1, name='creator')]),
         doer=None,
     )
 

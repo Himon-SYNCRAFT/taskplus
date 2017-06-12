@@ -1,8 +1,16 @@
 import bcrypt
 from sqlalchemy import Column, Integer, String, ForeignKey
 from sqlalchemy.orm import relationship
+from sqlalchemy.schema import Table
 
 from taskplus.apps.rest.database import Base
+
+
+user_role_to_user = Table(
+    'user_role_to_user', Base.metadata,
+    Column('user_id', Integer, ForeignKey('users.id')),
+    Column('role_id', Integer, ForeignKey('user_roles.id'))
+)
 
 
 class User(Base):
@@ -11,14 +19,13 @@ class User(Base):
     id = Column(Integer, primary_key=True)
     name = Column(String, nullable=False, unique=True)
     password = Column(String(64), nullable=False)
-    role_id = Column(Integer, ForeignKey('user_roles.id'), nullable=False)
 
-    role = relationship('UserRole')
+    roles = relationship('UserRole', secondary=user_role_to_user)
 
-    def __init__(self, name, password, role_id, id=None):
+    def __init__(self, name, password, roles, id=None):
         self.name = name
         self.password = self._hash_password(password)
-        self.role_id = role_id
+        self.roles = roles
         self.id = id
 
     def _hash_password(self, password):

@@ -8,7 +8,7 @@ from taskplus.core.shared.response import ResponseFailure
 def test_update_user_action():
     id, name = 1, 'name'
     users_repo = mock.Mock()
-    users_repo.update.return_value = User(id=id, name=name, role=mock.Mock())
+    users_repo.update.return_value = User(id=id, name=name, roles=mock.Mock())
 
     request = UpdateUserRequest(id=id, name=name)
 
@@ -23,7 +23,7 @@ def test_update_user_action():
 def test_update_user_action_handles_bad_requst():
     name = 'name'
     users_repo = mock.Mock()
-    users_repo.update.return_value = User(id=id, name=name, role=mock.Mock())
+    users_repo.update.return_value = User(id=id, name=name, roles=mock.Mock())
 
     request = UpdateUserRequest(id=None)
 

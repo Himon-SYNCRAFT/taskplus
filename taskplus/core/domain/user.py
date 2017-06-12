@@ -3,9 +3,9 @@ from taskplus.core.shared.domain_model import DomainModel
 
 class User(object):
 
-    def __init__(self, name, role, id=None):
+    def __init__(self, name, roles, id=None):
         self.name = name
-        self.role = role
+        self.roles = roles
         self.id = id
 
 

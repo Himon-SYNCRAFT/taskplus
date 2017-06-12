@@ -1,5 +1,5 @@
 import flask_login
-from flask_login import login_required
+from flask_login import login_required, current_user
 from flask import Blueprint, jsonify
 from flask import request as http_request
 
@@ -47,16 +47,30 @@ tasks_repository = TasksRepository()
 
 
 def get_status(response):
-
     status = 200
 
     if not response:
         if response.type == 'SYSTEM_ERROR':
-            status = 500
+            if response.message.startswith('NoResultFound'):
+                status = 404
+            else:
+                status = 500
         elif response.type == 'PARAMETER_ERROR':
             status = 400
 
     return status
+
+
+def get_loggedin_user():
+    name = current_user.get_id()
+    request = ListUsersRequest(filters=dict(name=name))
+    action = ListUsersAction(repo=users_repository)
+    response = action.execute(request)
+
+    if not response or not response.value:
+        return None
+
+    return response.value[0]
 
 
 @blueprint.route('/auth/login', methods=['POST'])
@@ -101,6 +115,7 @@ def logout():
 @blueprint.route('/roles', methods=['GET'])
 @login_required
 def get_all_user_roles():
+    get_loggedin_user()
     request = ListUserRolesRequest()
     action = ListUserRolesAction(user_roles_repository)
     response = action.execute(request)

@@ -12,7 +12,7 @@ def test_user_serializer():
         name=task_name,
         content=task_content,
         status=dict(id=1, name='new'),
-        creator=dict(id=1, name='creator', role=dict(id=1, name='creator')),
+        creator=dict(id=1, name='creator', roles=[dict(id=1, name='creator')]),
         doer=None,
         id=1
     )
@@ -22,7 +22,8 @@ def test_user_serializer():
     creator = User(
         id=task_dict['creator']['id'],
         name=task_dict['creator']['name'],
-        role=UserRole(**(task_dict['creator']['role']))
+        roles=[UserRole(name=role['name'], id=role['id'])
+               for role in task_dict['creator']['roles']]
     )
 
     task = Task(

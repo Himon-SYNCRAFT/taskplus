@@ -3,11 +3,11 @@ from taskplus.core.shared.request import Request
 
 class AddUserRequest(Request):
 
-    def __init__(self, name, password, role_id):
+    def __init__(self, name, password, roles):
         super().__init__()
         self.name = name
         self.password = password
-        self.role_id = role_id
+        self.roles = roles
         self._validate()
 
     def _validate(self):
@@ -33,10 +33,18 @@ class AddUserRequest(Request):
             )
             self._add_error('password', message)
 
-        if not self.role_id:
-            self._add_error('role_id', 'is required')
-        elif not isinstance(self.role_id, int):
-            message = 'expected int, got {}({})'.format(
-                self.role_id.__class__.__name__, self.role_id
+        if not self.roles:
+            self._add_error('roles', 'is required')
+        elif not isinstance(self.roles, list):
+            message = 'expected list, got {}({})'.format(
+                self.roles.__class__.__name__, self.roles
             )
-            self._add_error('role_id', message)
+            self._add_error('roles', message)
+        else:
+            for index, role in enumerate(self.roles):
+                if not isinstance(role, int):
+                    err = 'expected all elements to be int, got {}({}) at index {}'
+                    message = err.format(
+                        role.__class__.__name__, role, index
+                    )
+                    self._add_error('roles', message)

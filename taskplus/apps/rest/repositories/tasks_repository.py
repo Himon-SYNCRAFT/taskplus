@@ -88,8 +88,8 @@ class TasksRepository(Repository):
         creator = User(
             id=data.creator.id,
             name=data.creator.name,
-            role=UserRole(id=data.creator.role.id,
-                          name=data.creator.role.name)
+            roles=[UserRole(id=role.id, name=role.name)
+                   for role in data.creator.roles]
         )
 
         doer = None
@@ -98,8 +98,8 @@ class TasksRepository(Repository):
             doer = User(
                 id=data.doer.id,
                 name=data.doer.name,
-                role=UserRole(id=data.doer.role.id,
-                              name=data.doer.role.name)
+                roles=[UserRole(id=role.id, name=role.name)
+                       for role in data.doer.roles]
             )
 
         return Task(

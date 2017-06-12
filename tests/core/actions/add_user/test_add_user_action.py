@@ -14,9 +14,10 @@ def test_add_user_action():
     roles_repo.one.return_value = UserRole(name='role_name')
 
     users_repo = mock.Mock()
-    users_repo.save.return_value = User(name, roles_repo.one.return_value)
+    users_repo.save.return_value = User(
+        name=name, roles=[roles_repo.one.return_value])
 
-    request = AddUserRequest(name=name, password=password, role_id=role_id)
+    request = AddUserRequest(name=name, password=password, roles=[role_id])
     action = AddUserAction(users_repo, roles_repo)
 
     response = action.execute(request)
@@ -35,9 +36,10 @@ def test_add_user_action_handles_bad_request():
     roles_repo.one.return_value = UserRole(name='role_name')
 
     users_repo = mock.Mock()
-    users_repo.save.return_value = User('name', roles_repo.one.return_value)
+    users_repo.save.return_value = User(
+        name='name', roles=[roles_repo.one.return_value])
 
-    request = AddUserRequest(name=name, password=password, role_id=role_id)
+    request = AddUserRequest(name=name, password=password, roles=role_id)
     action = AddUserAction(users_repo, roles_repo)
 
     response = action.execute(request)
@@ -45,7 +47,7 @@ def test_add_user_action_handles_bad_request():
     assert not users_repo.save.called
     assert bool(response) is False
     assert response.value == {
-        'message': 'name: is required\npassword: is required\nrole_id: is required',
+        'message': 'name: is required\npassword: is required\nroles: is required',
         'type': ResponseFailure.PARAMETER_ERROR
     }
 
