@@ -7,3 +7,11 @@ class NoResultFound(ValueError):
 
     def __str__(self):
         return self.message
+
+
+class NotAuthorized(Exception):
+    pass
+
+
+class InvalidOperatorError(ValueError):
+    pass

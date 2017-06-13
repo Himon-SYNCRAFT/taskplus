@@ -1,4 +1,3 @@
-import sys
 import traceback
 from taskplus.core.shared.response import ResponseFailure
 
@@ -20,3 +19,6 @@ class Action(object):
     def process_request(self, request):
         raise NotImplementedError(
             'process_request() not implemented by Action class')
+
+    def get_name(self):
+        return self.__class__.__name__
