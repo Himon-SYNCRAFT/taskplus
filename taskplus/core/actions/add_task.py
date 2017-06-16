@@ -7,6 +7,7 @@ from taskplus.core.shared.response import ResponseSuccess
 class AddTaskAction(Action):
 
     def __init__(self, tasks_repo, users_repo, statuses_repo):
+        super().__init__()
         self.tasks_repo = tasks_repo
         self.users_repo = users_repo
         self.statuses_repo = statuses_repo
@@ -20,7 +21,10 @@ class AddTaskAction(Action):
                     status=status,
                     creator=creator)
 
+        self._call_before_execution_hooks(request, task)
         response = self.tasks_repo.save(task)
+        self._call_after_execution_hooks(request, response)
+
         return ResponseSuccess(response)
 
 

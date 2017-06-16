@@ -21,6 +21,32 @@ def test_get_task_details_action():
     assert response.value == task
 
 
+def test_get_task_details_action_with_hooks():
+    creator = mock.Mock()
+    status = mock.Mock()
+    task = Task(name='task', content=[], status=status, creator=creator, id=1)
+    tasks_repo = mock.Mock()
+    tasks_repo.one.return_value = task
+    request = GetTaskDetailsRequest(task.id)
+
+    action = GetTaskDetailsAction(tasks_repo)
+
+    before = mock.MagicMock()
+    after = mock.MagicMock()
+
+    action.add_before_execution_hook(before)
+    action.add_after_execution_hook(after)
+
+    response = action.execute(request)
+
+    assert before.called
+    assert after.called
+
+    assert bool(response) is True
+    tasks_repo.one.assert_called_once_with(task.id)
+    assert response.value == task
+
+
 def test_get_task_details_action_handles_bad_request():
     creator = mock.Mock()
     status = mock.Mock()

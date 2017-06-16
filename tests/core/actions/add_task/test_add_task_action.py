@@ -16,14 +16,46 @@ def test_add_task_action():
     statuses_repo = mock.Mock()
 
     tasks_repo.save.return_value = Task(name=task_name, content=task_content,
-                                       status=mock.Mock(), creator=mock.Mock(),
-                                       doer=None, id=task_id)
+                                        status=mock.Mock(), creator=mock.Mock(),
+                                        doer=None, id=task_id)
 
     request = AddTaskRequest(name=task_name, creator_id=creator_id,
                              content=task_content)
     action = AddTaskAction(tasks_repo, users_repo, statuses_repo)
     response = action.execute(request)
 
+    assert bool(response) is True
+    assert tasks_repo.save.called
+    assert response.value == tasks_repo.save.return_value
+
+
+def test_add_task_action_with_hooks():
+    task_name = 'task_name'
+    task_content = 'task_content'
+    creator_id = 1
+    task_id = 1
+
+    users_repo = mock.Mock()
+    tasks_repo = mock.Mock()
+    statuses_repo = mock.Mock()
+
+    tasks_repo.save.return_value = Task(name=task_name, content=task_content,
+                                        status=mock.Mock(), creator=mock.Mock(),
+                                        doer=None, id=task_id)
+
+    request = AddTaskRequest(name=task_name, creator_id=creator_id,
+                             content=task_content)
+    action = AddTaskAction(tasks_repo, users_repo, statuses_repo)
+
+    before = mock.MagicMock()
+    after = mock.MagicMock()
+    action.add_before_execution_hook(before)
+    action.add_after_execution_hook(after)
+
+    response = action.execute(request)
+
+    assert before.called
+    assert after.called
     assert bool(response) is True
     assert tasks_repo.save.called
     assert response.value == tasks_repo.save.return_value

@@ -6,10 +6,14 @@ from taskplus.core.shared.request import Request
 class GetRoleDetailsAction(Action):
 
     def __init__(self, roles_repo):
+        super().__init__()
         self.roles_repo = roles_repo
 
     def process_request(self, request):
+        self._call_before_execution_hooks(request, None)
         role = self.roles_repo.one(request.role_id)
+        self._call_after_execution_hooks(request, role)
+
         return ResponseSuccess(role)
 
 

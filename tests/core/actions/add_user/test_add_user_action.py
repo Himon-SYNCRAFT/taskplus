@@ -27,6 +27,36 @@ def test_add_user_action():
     assert response.value == users_repo.save.return_value
 
 
+def test_add_user_action_with_hooks():
+    name = 'name'
+    password = 'password'
+    role_id = 1
+
+    roles_repo = mock.Mock()
+    roles_repo.one.return_value = UserRole(name='role_name')
+
+    users_repo = mock.Mock()
+    users_repo.save.return_value = User(
+        name=name, roles=[roles_repo.one.return_value])
+
+    request = AddUserRequest(name=name, password=password, roles=[role_id])
+    action = AddUserAction(users_repo, roles_repo)
+
+    before = mock.MagicMock()
+    after = mock.MagicMock()
+
+    action.add_before_execution_hook(before)
+    action.add_after_execution_hook(after)
+
+    response = action.execute(request)
+
+    assert before.called
+    assert after.called
+    assert users_repo.save.called
+    assert bool(response) is True
+    assert response.value == users_repo.save.return_value
+
+
 def test_add_user_action_handles_bad_request():
     name = None
     password = None

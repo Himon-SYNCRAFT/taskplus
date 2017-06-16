@@ -5,11 +5,16 @@ from taskplus.core.shared.request import Request
 
 
 class ListTaskStatusesAction(Action):
+
     def __init__(self, repo):
+        super().__init__()
         self.statuses_repo = repo
 
     def process_request(self, request):
+        self._call_before_execution_hooks(request, None)
         statuses = self.statuses_repo.list(filters=request.filters)
+        self._call_after_execution_hooks(request, statuses)
+
         return ResponseSuccess(statuses)
 
 

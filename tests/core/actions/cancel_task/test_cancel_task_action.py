@@ -15,6 +15,26 @@ def test_cancel_task_action():
     assert task_repo.update.called
 
 
+def test_cancel_task_action_with_hooks():
+    task_repo = mock.Mock()
+    status_repo = mock.Mock()
+    action = CancelTaskAction(task_repo=task_repo, status_repo=status_repo)
+    request = CancelTaskRequest(task_id=1)
+
+    before = mock.MagicMock()
+    after = mock.MagicMock()
+
+    action.add_before_execution_hook(before)
+    action.add_after_execution_hook(after)
+
+    response = action.execute(request)
+
+    assert before.called
+    assert after.called
+    assert bool(response) is True
+    assert task_repo.update.called
+
+
 def test_cancel_task_action_handles_bad_request():
     task_repo = mock.Mock()
     status_repo = mock.Mock()

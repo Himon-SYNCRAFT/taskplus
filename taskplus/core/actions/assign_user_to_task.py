@@ -6,6 +6,7 @@ from taskplus.core.shared.request import Request
 class AssignUserToTaskAction(Action):
 
     def __init__(self, tasks_repo, users_repo):
+        super().__init__()
         self.tasks_repo = tasks_repo
         self.users_repo = users_repo
 
@@ -17,7 +18,10 @@ class AssignUserToTaskAction(Action):
         task = self.tasks_repo.one(task_id)
         task.doer = user
 
+        self._call_before_execution_hooks(request, task)
         response = self.tasks_repo.update(task)
+        self._call_after_execution_hooks(request, task)
+
         return ResponseSuccess(response)
 
 

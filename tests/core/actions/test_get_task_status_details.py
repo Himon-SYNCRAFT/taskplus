@@ -21,6 +21,31 @@ def test_get_status_details_action():
     assert response.value == status
 
 
+def test_get_status_details_action_with_hooks():
+    status = mock.Mock()
+    status = TaskStatus(name='new', id=1)
+    statuses_repo = mock.Mock()
+    statuses_repo.one.return_value = status
+    request = GetTaskStatusDetailsRequest(status.id)
+
+    action = GetTaskStatusDetailsAction(statuses_repo)
+
+    before = mock.MagicMock()
+    after = mock.MagicMock()
+
+    action.add_before_execution_hook(before)
+    action.add_after_execution_hook(after)
+
+    response = action.execute(request)
+
+    assert before.called
+    assert after.called
+
+    assert bool(response) is True
+    statuses_repo.one.assert_called_once_with(status.id)
+    assert response.value == status
+
+
 def test_get_status_details_action_handles_bad_request():
     status = mock.Mock()
     status = TaskStatus(name='new', id=1)

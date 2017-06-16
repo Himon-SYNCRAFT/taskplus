@@ -18,6 +18,30 @@ def test_add_user_role_action():
     assert response.value == roles_repo.save.return_value
 
 
+def test_add_user_role_action_with_hooks():
+    role_name = 'admin'
+    roles_repo = mock.Mock()
+    roles_repo.save.return_value = mock.Mock()
+    request = AddUserRoleRequest(name=role_name)
+
+    action = AddUserRoleAction(roles_repo)
+
+    before = mock.MagicMock()
+    after = mock.MagicMock()
+
+    action.add_before_execution_hook(before)
+    action.add_after_execution_hook(after)
+
+    response = action.execute(request)
+
+    assert before.called
+    assert after.called
+
+    assert bool(response) is True
+    assert roles_repo.save.called
+    assert response.value == roles_repo.save.return_value
+
+
 def test_add_user_role_action_handles_bad_request():
     role_name = None
     roles_repo = mock.Mock()

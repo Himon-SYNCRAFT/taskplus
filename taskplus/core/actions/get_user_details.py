@@ -6,10 +6,14 @@ from taskplus.core.shared.request import Request
 class GetUserDetailsAction(Action):
 
     def __init__(self, users_repo):
+        super().__init__()
         self.users_repo = users_repo
 
     def process_request(self, request):
+        self._call_before_execution_hooks(request, None)
         user = self.users_repo.one(request.user_id)
+        self._call_after_execution_hooks(request, user)
+
         return ResponseSuccess(user)
 
 

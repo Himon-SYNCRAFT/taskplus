@@ -29,6 +29,29 @@ def test_list_statuses_without_parameters(statuses):
     assert response.value == statuses
 
 
+def test_list_statuses_with_hooks(statuses):
+    repo = mock.Mock()
+    repo.list.return_value = statuses
+
+    request = ListTaskStatusesRequest()
+    action = ListTaskStatusesAction(repo)
+
+    before = mock.MagicMock()
+    after = mock.MagicMock()
+
+    action.add_before_execution_hook(before)
+    action.add_after_execution_hook(after)
+
+    response = action.execute(request)
+
+    assert before.called
+    assert after.called
+
+    assert bool(response) is True
+    repo.list.assert_called_with(filters=None)
+    assert response.value == statuses
+
+
 def test_list_statuses_with_parameters(statuses):
     repo = mock.Mock()
     repo.list.return_value = statuses

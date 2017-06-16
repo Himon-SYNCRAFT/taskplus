@@ -6,16 +6,20 @@ from taskplus.core.shared.response import ResponseSuccess
 class UpdateTaskStatusAction(Action):
 
     def __init__(self, repo):
+        super().__init__()
         self.repo = repo
 
     def process_request(self, request):
         status = self.repo.one(id=request.id)
+        self._call_before_execution_hooks(request, status)
 
         if request.name:
             status.name = request.name
 
-        self.repo.update(status)
-        return ResponseSuccess(status)
+        response = self.repo.update(status)
+        self._call_after_execution_hooks(request, response)
+
+        return ResponseSuccess(response)
 
 
 class UpdateTaskStatusRequest(Request):

@@ -6,11 +6,16 @@ from taskplus.core.shared.request import Request
 class DeleteUserRoleAction(Action):
 
     def __init__(self, repo):
+        super().__init__()
         self.repo = repo
 
     def process_request(self, request):
         user_role_id = request.id
+
+        self._call_before_execution_hooks(request, None)
         role = self.repo.delete(user_role_id)
+        self._call_after_execution_hooks(request, role)
+
         return ResponseSuccess(role)
 
 

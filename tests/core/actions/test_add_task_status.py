@@ -69,6 +69,30 @@ def test_add_task_status_action():
     assert response.value == statuses_repo.save.return_value
 
 
+def test_add_task_status_action_with_hooks():
+    status_name = 'new'
+    statuses_repo = mock.Mock()
+    statuses_repo.save.return_value = mock.Mock()
+    request = AddTaskStatusRequest(name=status_name)
+
+    action = AddTaskStatusAction(statuses_repo)
+
+    before = mock.MagicMock()
+    after = mock.MagicMock()
+
+    action.add_before_execution_hook(before)
+    action.add_after_execution_hook(after)
+
+    response = action.execute(request)
+
+    assert before.called
+    assert after.called
+
+    assert bool(response) is True
+    assert statuses_repo.save.called
+    assert response.value == statuses_repo.save.return_value
+
+
 def test_add_task_status_action_handles_bad_request():
     status_name = None
     statuses_repo = mock.Mock()

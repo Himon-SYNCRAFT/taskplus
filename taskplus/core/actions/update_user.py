@@ -6,11 +6,14 @@ from taskplus.core.shared.request import Request
 class UpdateUserAction(Action):
 
     def __init__(self, repo):
+        super().__init__()
         self.repo = repo
 
     def process_request(self, request):
         user_id = request.id
         user = self.repo.one(user_id)
+
+        self._call_before_execution_hooks(request, user)
 
         if request.name:
             user.name = request.name
@@ -19,6 +22,8 @@ class UpdateUserAction(Action):
             user.role.id = request.role_id
 
         response = self.repo.update(user)
+        self._call_after_execution_hooks(request, response)
+
         return ResponseSuccess(response)
 
 

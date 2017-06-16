@@ -6,12 +6,16 @@ from taskplus.core.shared.request import Request
 class DeleteUserAction(Action):
 
     def __init__(self, repo):
+        super().__init__()
         self.repo = repo
 
     def process_request(self, request):
         user_id = request.id
 
+        self._call_before_execution_hooks(request, None)
         response = self.repo.delete(user_id)
+        self._call_after_execution_hooks(request, response)
+
         return ResponseSuccess(response)
 
 

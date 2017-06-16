@@ -17,6 +17,28 @@ def test_assign_user_to_task_action():
     assert tasks_repo.update.called
 
 
+def test_assign_user_to_task_action_with_hooks():
+    tasks_repo = mock.Mock()
+    users_repo = mock.Mock()
+
+    request = AssignUserToTaskRequest(task_id=1, user_id=2)
+
+    action = AssignUserToTaskAction(tasks_repo, users_repo)
+
+    before = mock.MagicMock()
+    after = mock.MagicMock()
+
+    action.add_before_execution_hook(before)
+    action.add_after_execution_hook(after)
+
+    response = action.execute(request)
+
+    assert before.called
+    assert after.called
+    assert bool(response) is True
+    assert tasks_repo.update.called
+
+
 def test_assing_user_to_task_action_handles_bad_request():
     tasks_repo = mock.Mock()
     users_repo = mock.Mock()

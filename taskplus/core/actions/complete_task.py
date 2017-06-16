@@ -7,6 +7,7 @@ from taskplus.core.shared.request import Request
 class CompleteTaskAction(Action):
 
     def __init__(self, task_repo, status_repo):
+        super().__init__()
         self.task_repo = task_repo
         self.status_repo = status_repo
 
@@ -16,7 +17,10 @@ class CompleteTaskAction(Action):
         task = self.task_repo.one(task_id)
         task.status = status
 
+        self._call_before_execution_hooks(request, task)
         response = self.task_repo.update(task)
+        self._call_after_execution_hooks(request, response)
+
         return ResponseSuccess(response)
 
 

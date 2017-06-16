@@ -29,6 +29,29 @@ def test_list_roles_without_parameters(roles):
     assert response.value == roles
 
 
+def test_list_roles_with_hooks(roles):
+    repo = mock.Mock()
+    repo.list.return_value = roles
+
+    request = ListUserRolesRequest()
+    action = ListUserRolesAction(repo)
+
+    before = mock.MagicMock()
+    after = mock.MagicMock()
+
+    action.add_before_execution_hook(before)
+    action.add_after_execution_hook(after)
+
+    response = action.execute(request)
+
+    assert before.called
+    assert after.called
+
+    assert bool(response) is True
+    repo.list.assert_called_with(filters=None)
+    assert response.value == roles
+
+
 def test_list_roles_with_parameters(roles):
     repo = mock.Mock()
     repo.list.return_value = roles

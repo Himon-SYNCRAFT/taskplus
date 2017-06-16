@@ -6,16 +6,21 @@ from taskplus.core.shared.request import Request
 class UpdateUserRoleAction(Action):
 
     def __init__(self, repo):
+        super().__init__()
         self.repo = repo
 
     def process_request(self, request):
         role = self.repo.one(id=request.id)
 
+        self._call_before_execution_hooks(request, role)
+
         if request.name:
             role.name = request.name
 
-        self.repo.update(role)
-        return ResponseSuccess(role)
+        response = self.repo.update(role)
+        self._call_after_execution_hooks(request, response)
+
+        return ResponseSuccess(response)
 
 
 class UpdateUserRoleRequest(Request):

@@ -17,6 +17,28 @@ def test_delete_user_action():
     assert repo.delete.called
 
 
+def test_delete_user_action_with_hooks():
+    user_id = 1
+    repo = mock.Mock()
+    repo.delete.return_value = user_id
+    request = DeleteUserRequest(id=user_id)
+    action = DeleteUserAction(repo=repo)
+
+    before = mock.MagicMock()
+    after = mock.MagicMock()
+
+    action.add_before_execution_hook(before)
+    action.add_after_execution_hook(after)
+
+    response = action.execute(request)
+
+    assert before.called
+    assert after.called
+    assert bool(response) is True
+    assert response.value == repo.delete.return_value
+    assert repo.delete.called
+
+
 def test_delete_user_action_handles_bad_request():
     user_id = None
     repo = mock.Mock()

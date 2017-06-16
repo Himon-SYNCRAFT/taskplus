@@ -1,7 +1,6 @@
 from flask_login import LoginManager
 from flask import jsonify
 
-from taskplus.core.actions import ListUsersAction, ListUsersRequest
 from taskplus.apps.rest.repositories import UsersRepository
 
 
@@ -11,14 +10,12 @@ login_manager = LoginManager()
 @login_manager.user_loader
 def user_loader(name):
     repository = UsersRepository()
-    request = ListUsersRequest(filters=dict(name=name))
-    action = ListUsersAction(repo=repository)
-    response = action.execute(request)
+    response = repository.list(filters=dict(name=name))
 
-    if not response or not response.value:
+    if not response:
         return None
 
-    user = response.value[0]
+    user = response[0]
     user.is_active = True
     user.is_authenticated = True
     user.is_anonymous = False
@@ -32,14 +29,12 @@ def request_loader(request):
     name = request.form.get('name')
 
     repository = UsersRepository()
-    request = ListUsersRequest(filters=dict(name=name))
-    action = ListUsersAction(repo=repository)
-    response = action.execute(request)
+    response = repository.list(filters=dict(name=name))
 
-    if not response or not response.value:
+    if not response:
         return None
 
-    user = response.value[0]
+    user = response[0]
     user.is_authenticated = repository.check_password(
         user, request.form['password'])
     user.is_active = True

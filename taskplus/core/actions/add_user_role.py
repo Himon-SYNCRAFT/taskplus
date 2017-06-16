@@ -7,11 +7,14 @@ from taskplus.core.shared.response import ResponseSuccess
 class AddUserRoleAction(Action):
 
     def __init__(self, roles_repo):
+        super().__init__()
         self.roles_repo = roles_repo
 
     def process_request(self, request):
         new_role = UserRole(name=request.name)
+        self._call_before_execution_hooks(request, new_role)
         response = self.roles_repo.save(new_role)
+        self._call_after_execution_hooks(request, new_role)
         return ResponseSuccess(response)
 
 

@@ -46,7 +46,29 @@ def test_update_task_status():
 
     assert bool(response) is True
     assert repo.update.called
-    assert response.value == repo.one.return_value
+    assert response.value == repo.update.return_value
+
+
+def test_update_task_status_with_hooks():
+    task_status_id = 1
+    repo = mock.Mock()
+    request = UpdateTaskStatusRequest(id=task_status_id, name='new')
+    action = UpdateTaskStatusAction(repo=repo)
+
+    before = mock.MagicMock()
+    after = mock.MagicMock()
+
+    action.add_before_execution_hook(before)
+    action.add_after_execution_hook(after)
+
+    response = action.execute(request)
+
+    assert before.called
+    assert after.called
+
+    assert bool(response) is True
+    assert repo.update.called
+    assert response.value == repo.update.return_value
 
 
 def test_update_task_status_handles_bad_request():

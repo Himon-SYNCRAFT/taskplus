@@ -26,6 +26,27 @@ def test_get_not_completed_tasks(tasks):
     assert response.value == repo.list.return_value
 
 
+def test_get_not_completed_tasks_with_hooks(tasks):
+    repo = mock.Mock()
+    repo.list.return_value = tasks
+    request = GetNotCompletedTasksRequest()
+    action = GetNotCompletedTasksAction(task_repo=repo)
+
+    before = mock.MagicMock()
+    after = mock.MagicMock()
+
+    action.add_before_execution_hook(before)
+    action.add_after_execution_hook(after)
+
+    response = action.execute(request)
+
+    assert before.called
+    assert after.called
+
+    assert bool(response) is True
+    assert response.value == repo.list.return_value
+
+
 def test_list_handles_exception():
     repo = mock.Mock()
     error_message = 'Error!!!'

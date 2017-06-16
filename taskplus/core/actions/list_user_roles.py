@@ -7,10 +7,13 @@ from taskplus.core.shared.request import Request
 class ListUserRolesAction(Action):
 
     def __init__(self, repo):
+        super().__init__()
         self.repo = repo
 
     def process_request(self, request):
+        self._call_before_execution_hooks(request, None)
         roles = self.repo.list(filters=request.filters)
+        self._call_after_execution_hooks(request, roles)
         return ResponseSuccess(roles)
 
 

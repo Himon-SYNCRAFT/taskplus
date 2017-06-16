@@ -17,6 +17,28 @@ def test_complete_task_action():
     assert task_repo.update.called
 
 
+def test_complete_task_action_with_hooks():
+    task_id = 1
+    task_repo = mock.Mock()
+    status_repo = mock.Mock()
+
+    action = CompleteTaskAction(task_repo, status_repo)
+    request = CompleteTaskRequest(task_id)
+
+    before = mock.MagicMock()
+    after = mock.MagicMock()
+
+    action.add_before_execution_hook(before)
+    action.add_after_execution_hook(after)
+
+    response = action.execute(request)
+
+    assert before.called
+    assert after.called
+    assert bool(response) is True
+    assert task_repo.update.called
+
+
 def test_complete_task_action_handles_bad_request():
     task_id = None
     task_repo = mock.Mock()

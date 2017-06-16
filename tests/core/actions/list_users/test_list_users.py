@@ -25,6 +25,27 @@ def test_list_users_action_without_parameters(users):
     assert response.value == repo.list.return_value
 
 
+def test_list_users_action_with_hooks(users):
+    repo = mock.Mock()
+    repo.list.return_value = users
+    request = ListUsersRequest()
+    action = ListUsersAction(repo=repo)
+
+    before = mock.MagicMock()
+    after = mock.MagicMock()
+
+    action.add_before_execution_hook(before)
+    action.add_after_execution_hook(after)
+
+    response = action.execute(request)
+
+    assert before.called
+    assert after.called
+
+    assert bool(response) is True
+    assert response.value == repo.list.return_value
+
+
 def test_list_users_action_with_parameters(users):
     filters = dict(name='name1')
     repo = mock.Mock()

@@ -1,13 +1,55 @@
 import json
 from unittest import mock
+from sqlalchemy import event
+from sqlalchemy.engine import Engine
+from collections import namedtuple
 
 from taskplus.core.shared.response import ResponseSuccess
 from taskplus.core.domain import User, UserRole
+from taskplus.apps.rest.database import Base, db_session, engine
 
 
 user_name = 'admin'
 user = User(name=user_name, id=1, roles=[UserRole(id=1, name='creator')])
 users = [user]
+
+
+def setup_function(function):
+    user_ = namedtuple('user_', ['id', 'name', 'role_id', 'role_name'])
+    creator_ = user_(id=1, name='creator', role_id=1, role_name='creator_role')
+    doer_ = user_(id=2, name='doer', role_id=2, role_name='doer_role')
+
+    if db_session.bind.driver == 'pysqlite':
+        @event.listens_for(Engine, "connect")
+        def set_sqlite_pragma(dbapi_connection, connection_record):
+            cursor = dbapi_connection.cursor()
+            cursor.execute("PRAGMA foreign_keys=ON")
+            cursor.close()
+
+    with mock.patch('taskplus.apps.rest.models.User._hash_password',
+                    side_effect=lambda x: x):
+        from taskplus.apps.rest import models
+        Base.metadata.reflect(engine)
+        Base.metadata.drop_all(engine)
+        Base.metadata.create_all(engine)
+
+        creator_role = models.UserRole(name=creator_.role_name,
+                                       id=creator_.role_id)
+        doer_role = models.UserRole(name=doer_.role_name,
+                                    id=doer_.role_id)
+
+        db_session.add(creator_role)
+        db_session.add(doer_role)
+        db_session.commit()
+
+        creator = models.User(name=creator_.name, roles=[creator_role],
+                              id=creator_.id, password='pass')
+        doer = models.User(name=doer_.name, roles=[doer_role],
+                           id=doer_.id, password='pass')
+
+        db_session.add(creator)
+        db_session.add(doer)
+        db_session.commit()
 
 
 @mock.patch('taskplus.apps.rest.routes.users_repository.check_password',

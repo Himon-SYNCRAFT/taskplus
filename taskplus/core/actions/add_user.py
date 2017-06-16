@@ -7,6 +7,7 @@ from taskplus.core.shared.response import ResponseSuccess
 class AddUserAction(Action):
 
     def __init__(self, users_repo, roles_repo):
+        super().__init__()
         self.users_repo = users_repo
         self.roles_repo = roles_repo
 
@@ -15,7 +16,10 @@ class AddUserAction(Action):
             dict(id_in=request.roles))
         user = User(name=request.name, roles=roles)
 
+        self._call_before_execution_hooks(request, user)
         response = self.users_repo.save(user, password=request.password)
+        self._call_after_execution_hooks(request, response)
+
         return ResponseSuccess(response)
 
 

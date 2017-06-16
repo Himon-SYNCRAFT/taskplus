@@ -14,7 +14,29 @@ def test_update_user_role():
 
     assert bool(response) is True
     assert repo.update.called
-    assert response.value == repo.one.return_value
+    assert response.value == repo.update.return_value
+
+
+def test_update_user_role_with_hooks():
+    user_role_id = 1
+    repo = mock.Mock()
+    request = UpdateUserRoleRequest(id=user_role_id, name='admin')
+    action = UpdateUserRoleAction(repo=repo)
+
+    before = mock.MagicMock()
+    after = mock.MagicMock()
+
+    action.add_before_execution_hook(before)
+    action.add_after_execution_hook(after)
+
+    response = action.execute(request)
+
+    assert before.called
+    assert after.called
+
+    assert bool(response) is True
+    assert repo.update.called
+    assert response.value == repo.update.return_value
 
 
 def test_update_user_role_handles_bad_request():

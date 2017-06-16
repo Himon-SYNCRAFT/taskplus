@@ -20,6 +20,31 @@ def test_update_user_action():
     assert response.value == users_repo.update.return_value
 
 
+def test_update_user_action_with_hooks():
+    id, name = 1, 'name'
+    users_repo = mock.Mock()
+    users_repo.update.return_value = User(id=id, name=name, roles=mock.Mock())
+
+    request = UpdateUserRequest(id=id, name=name)
+
+    action = UpdateUserAction(repo=users_repo)
+
+    before = mock.MagicMock()
+    after = mock.MagicMock()
+
+    action.add_before_execution_hook(before)
+    action.add_after_execution_hook(after)
+
+    response = action.execute(request)
+
+    assert before.called
+    assert after.called
+
+    assert bool(response) is True
+    assert users_repo.update.called
+    assert response.value == users_repo.update.return_value
+
+
 def test_update_user_action_handles_bad_requst():
     name = 'name'
     users_repo = mock.Mock()

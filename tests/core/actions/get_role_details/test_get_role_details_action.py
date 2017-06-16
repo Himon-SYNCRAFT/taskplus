@@ -20,6 +20,31 @@ def test_get_role_details_action():
     assert response.value == role
 
 
+def test_get_role_details_action_with_hooks():
+    role = mock.Mock()
+    role = UserRole(name='admin', id=1)
+    roles_repo = mock.Mock()
+    roles_repo.one.return_value = role
+    request = GetRoleDetailsRequest(role.id)
+
+    action = GetRoleDetailsAction(roles_repo)
+
+    before = mock.MagicMock()
+    after = mock.MagicMock()
+
+    action.add_before_execution_hook(before)
+    action.add_after_execution_hook(after)
+
+    response = action.execute(request)
+
+    assert before.called
+    assert after.called
+
+    assert bool(response) is True
+    roles_repo.one.assert_called_once_with(role.id)
+    assert response.value == role
+
+
 def test_get_role_details_action_handles_bad_request():
     role = mock.Mock()
     role = UserRole(name='admin', id=1)

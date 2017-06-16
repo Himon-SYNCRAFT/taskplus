@@ -6,14 +6,19 @@ from taskplus.core.shared.request import Request
 class UnassignUserFromTaskAction(Action):
 
     def __init__(self, tasks_repo):
+        super().__init__()
         self.tasks_repo = tasks_repo
 
     def process_request(self, request):
         task_id = request.task_id
         task = self.tasks_repo.one(task_id)
 
+        self._call_before_execution_hooks(request, task)
+
         task.doer = None
         response = self.tasks_repo.update(task)
+
+        self._call_after_execution_hooks(request, response)
 
         return ResponseSuccess(response)
 
