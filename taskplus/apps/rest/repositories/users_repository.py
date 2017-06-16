@@ -3,6 +3,7 @@ from taskplus.apps.rest.database import db_session
 from taskplus.core.domain import User, UserRole
 from taskplus.core.shared.repository import Repository
 from taskplus.core.shared.exceptions import NoResultFound
+from taskplus.core.authorization import Permission, Condition
 
 
 class UsersRepository(Repository):
@@ -23,7 +24,6 @@ class UsersRepository(Repository):
         if not filters:
             result = self.user_model.query.all()
         else:
-            print('t')
             filters = self._parse_filters(filters)
             filters_expression = []
 
@@ -79,11 +79,72 @@ class UsersRepository(Repository):
         return rv
 
     def _to_domain_model(self, data):
+        permissions = []
+
+        for role in data.roles:
+            if role.name == 'creator':
+                permissions.append(Permission('ListTasksAction'))
+                permissions.append(Permission('ListTaskStatusesAction'))
+                permissions.append(Permission('ListUserRolesAction'))
+                permissions.append(Permission('AddTaskAction'))
+                permissions.append(Permission('CancelTaskAction', conditions=[
+                    Condition('resource.doer', 'eq', 'None')
+                ]))
+                permissions.append(Permission('GetTaskDetailsAction'))
+                permissions.append(Permission('GetRoleDetailsAction'))
+                permissions.append(Permission('GetTaskStatusDetailsAction'))
+                permissions.append(Permission('GetUserDetailsAction', conditions=[
+                    Condition('request.id', 'eq', 'user.id')
+                ]))
+                permissions.append(Permission('GetNotCompletedTasksAction'))
+
+            if role.name == 'doer':
+                permissions.append(Permission('CancelTaskAction'))
+                permissions.append(Permission('CompleteTaskAction'))
+                permissions.append(
+                    Permission('AssignUserToTaskAction', conditions=[
+                        Condition('request.id', 'eq', 'user.id')
+                    ]))
+                permissions.append(
+                    Permission('UnassignUserFromTaskAction', conditions=[
+                        Condition('request.id', 'eq', 'user.id')
+                    ]))
+                permissions.append(Permission('GetUserDetailsAction', conditions=[
+                    Condition('request.id', 'eq', 'user.id')
+                ]))
+                permissions.append(Permission('GetTaskDetailsAction'))
+                permissions.append(Permission('GetRoleDetailsAction'))
+                permissions.append(Permission('GetTaskStatusDetailsAction'))
+                permissions.append(Permission('ListTasksAction'))
+                permissions.append(Permission('ListTaskStatusesAction'))
+                permissions.append(Permission('ListUserRolesAction'))
+                permissions.append(Permission('GetNotCompletedTasksAction'))
+
+            if role.name == 'admin':
+                permissions.append(Permission('AddUserRoleAction'))
+                permissions.append(Permission('DeleteUserRoleAction'))
+                permissions.append(Permission('ListUserRolesAction'))
+                permissions.append(Permission('UpdateUserRoleAction'))
+                permissions.append(Permission('AddUserAction'))
+                permissions.append(Permission('ListUsersAction'))
+                permissions.append(Permission('UpdateUserAction'))
+                permissions.append(Permission('DeleteUserAction'))
+                permissions.append(Permission('GetTaskDetailsAction'))
+                permissions.append(Permission('GetRoleDetailsAction'))
+                permissions.append(Permission('GetTaskStatusDetailsAction'))
+                permissions.append(Permission('GetUserDetailsAction'))
+                permissions.append(Permission('ListTasksAction'))
+                permissions.append(Permission('ListTaskStatusesAction'))
+                permissions.append(Permission('AddTaskStatusAction'))
+                permissions.append(Permission('DeleteTaskStatusAction'))
+                permissions.append(Permission('UpdateTaskStatusAction'))
+
         return User(
             id=data.id,
             name=data.name,
             roles=[UserRole(id=role.id, name=role.name)
-                   for role in data.roles]
+                   for role in data.roles],
+            permissions=permissions
         )
 
     def check_password(self, user, password):

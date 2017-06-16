@@ -1,28 +1,21 @@
-from operator import lt, le, eq, ne, ge, gt
+from operator import eq, ne
 from taskplus.core.shared.exceptions import NotAuthorized, InvalidOperatorError
 
 
 class AuthorizationManager(object):
 
-    def authorize(self, user, action, request):
+    def authorize(self, user, action, data):
         if not user.permissions:
             raise NotAuthorized
 
-        permissions = [permission for permission in user.permissions
-                       if permission.action == action.get_name()]
+        permissions = (permission for permission in user.permissions
+                       if permission.action == action)
 
-        if any([self._is_permitted(permission, user, request) is True
-                for permission in permissions]):
+        if any(permission.is_user_permitted(user, data)
+               for permission in permissions):
             return
 
         raise NotAuthorized
-
-    def _is_permitted(self, permission, user, request):
-        if not permission.conditions:
-            return True
-
-        return all([condition.is_condition_met(user, request)
-                    for condition in permission.conditions])
 
 
 class Permission(object):
@@ -34,6 +27,13 @@ class Permission(object):
         if conditions is None:
             self.conditions = []
 
+    def is_user_permitted(self, user, data):
+        if not self.conditions:
+            return True
+
+        return all(condition.is_met(user, data)
+                   for condition in self.conditions)
+
 
 class Condition(object):
 
@@ -42,7 +42,7 @@ class Condition(object):
         self.operator = operator
         self.right = right
 
-    def is_condition_met(self, user, request):
+    def is_met(self, user, data):
         operator = self._parse_operator()
         left = self.left.split('.', maxsplit=1)
         right = self.right.split('.', maxsplit=1)
@@ -61,13 +61,17 @@ class Condition(object):
 
         if left == 'user':
             left = user
-        elif left == 'request':
-            left = request
+        elif left.isnumeric():
+            left = int(left)
+        else:
+            left = data[left]
 
         if right == 'user':
             right = user
-        elif right == 'request':
-            right = request
+        elif right.isnumeric():
+            right = int(right)
+        else:
+            right = data[right]
 
         if left_attribute:
             left = getattr(left, left_attribute)
@@ -78,7 +82,7 @@ class Condition(object):
         return operator(left, right)
 
     def _parse_operator(self):
-        allowed_operators = ['eq', 'lt', 'le', 'ne', 'ge', 'gt']
+        allowed_operators = ['eq', 'ne']
 
         if self.operator not in allowed_operators:
             raise InvalidOperatorError('Operator {} is not supported'.format(
@@ -87,15 +91,7 @@ class Condition(object):
 
         if self.operator == 'eq':
             return eq
-        elif self.operator == 'lt':
-            return lt
-        elif self.operator == 'le':
-            return le
         elif self.operator == 'ne':
             return ne
-        elif self.operator == 'ge':
-            return ge
-        elif self.operator == 'gt':
-            return gt
 
         return eq
