@@ -38,19 +38,27 @@ def create_db():
     Base.metadata.drop_all(engine)
     Base.metadata.create_all(engine)
 
-    creator_role = models.UserRole(name='creator_role')
-    doer_role = models.UserRole(name='doer_role')
+    creator_role = models.UserRole(name='creator')
+    doer_role = models.UserRole(name='doer')
+    admin_role = models.UserRole(name='admin')
 
     db_session.add(creator_role)
     db_session.add(doer_role)
+    db_session.add(admin_role)
     db_session.commit()
 
     creator = models.User(name='creator', roles=[creator_role],
                           password='creator')
     doer = models.User(name='doer', roles=[doer_role], password='doer')
+    super_user = models.User(
+        name='super',
+        roles=[creator_role, doer_role, admin_role],
+        password='super'
+    )
 
     db_session.add(creator)
     db_session.add(doer)
+    db_session.add(super_user)
     db_session.commit()
 
     status_new = models.TaskStatus(id=Statuses.NEW, name='new')

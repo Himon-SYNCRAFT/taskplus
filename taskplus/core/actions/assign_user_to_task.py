@@ -16,9 +16,9 @@ class AssignUserToTaskAction(Action):
 
         user = self.users_repo.one(user_id)
         task = self.tasks_repo.one(task_id)
-        task.doer = user
-
         self._call_before_execution_hooks(request, task)
+
+        task.doer.id = user.id
         response = self.tasks_repo.update(task)
         self._call_after_execution_hooks(request, task)
 

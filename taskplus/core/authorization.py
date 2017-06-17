@@ -3,15 +3,16 @@ from taskplus.core.shared.exceptions import NotAuthorized, InvalidOperatorError
 
 
 class AuthorizationManager(object):
+    user = None
 
-    def authorize(self, user, action, data):
-        if not user.permissions:
+    def authorize(self, action, data):
+        if not self.user or not self.user.permissions:
             raise NotAuthorized
 
-        permissions = (permission for permission in user.permissions
+        permissions = (permission for permission in self.user.permissions
                        if permission.action == action)
 
-        if any(permission.is_user_permitted(user, data)
+        if any(permission.is_user_permitted(self.user, data)
                for permission in permissions):
             return
 

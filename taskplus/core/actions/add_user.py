@@ -13,7 +13,7 @@ class AddUserAction(Action):
 
     def process_request(self, request):
         roles = self.roles_repo.list(
-            dict(id_in=request.roles))
+            dict(id__in=request.roles))
         user = User(name=request.name, roles=roles)
 
         self._call_before_execution_hooks(request, user)

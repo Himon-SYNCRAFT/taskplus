@@ -43,10 +43,10 @@ def test_authorization_manager_raise_not_authorized_without_permissions():
     action = 'ListUsersAction'
     request = mock.Mock()
     authorization_manager = AuthorizationManager()
+    authorization_manager.user = user
 
     with pytest.raises(NotAuthorized):
-        authorization_manager.authorize(user=user, action=action,
-                                        data=dict(request=request))
+        authorization_manager.authorize(action=action, data=dict(request=request))
 
 
 def test_authorization_manager_with_permission():
@@ -55,8 +55,8 @@ def test_authorization_manager_with_permission():
     request = mock.Mock()
     user.permissions = [Permission(action)]
     authorization_manager = AuthorizationManager()
-    authorization_manager.authorize(user=user, action=action,
-                                    data=dict(request=request))
+    authorization_manager.user = user
+    authorization_manager.authorize(action=action, data=dict(request=request))
 
 
 def test_authorization_manager_permission_with_condition():
@@ -67,8 +67,8 @@ def test_authorization_manager_permission_with_condition():
     conditions = [Condition('user.id', 'eq', '1')]
     user.permissions = [Permission(action, conditions=conditions)]
     authorization_manager = AuthorizationManager()
-    authorization_manager.authorize(user=user, action=action,
-                                    data=dict(request=request))
+    authorization_manager.user = user
+    authorization_manager.authorize(action=action, data=dict(request=request))
 
 
 def test_authorization_manager_permission_with_multiple_conditions():
@@ -81,8 +81,8 @@ def test_authorization_manager_permission_with_multiple_conditions():
                   Condition('request.id', 'eq', '2')]
     user.permissions = [Permission(action, conditions=conditions)]
     authorization_manager = AuthorizationManager()
-    authorization_manager.authorize(user=user, action=action,
-                                    data=dict(request=request))
+    authorization_manager.user = user
+    authorization_manager.authorize(action=action, data=dict(request=request))
 
 
 def test_authorization_manager_unmet_condition_raise_not_authorized_exc():
@@ -93,7 +93,7 @@ def test_authorization_manager_unmet_condition_raise_not_authorized_exc():
     conditions = [Condition('user.id', 'eq', '2')]
     user.permissions = [Permission(action, conditions=conditions)]
     authorization_manager = AuthorizationManager()
+    authorization_manager.user = user
 
     with pytest.raises(NotAuthorized):
-        authorization_manager.authorize(user=user, action=action,
-                                        data=dict(request=request))
+        authorization_manager.authorize(action=action, data=dict(request=request))

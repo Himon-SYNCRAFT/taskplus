@@ -33,6 +33,7 @@ from taskplus.core.actions import (
     UnassignUserFromTaskAction, UnassignUserFromTaskRequest,
     AddTaskAction, AddTaskRequest,
 )
+from taskplus.core.authorization import AuthorizationManager
 from taskplus.core.serializers.user_role_serializer import UserRoleEncoder
 from taskplus.core.serializers.task_status_serializer import TaskStatusEncoder
 from taskplus.core.serializers.user_serializer import UserEncoder
@@ -44,6 +45,7 @@ user_roles_repository = UserRolesRepository()
 task_statuses_repository = TaskStatusesRepository()
 users_repository = UsersRepository()
 tasks_repository = TasksRepository()
+authorization_manager = AuthorizationManager()
 
 
 def get_status(response):
@@ -102,12 +104,14 @@ def login():
     user.get_id = get_id
 
     flask_login.login_user(user)
+    authorization_manager.user = user
     return json_response(response.value[0], UserEncoder)
 
 
 @blueprint.route('/auth/logout', methods=['GET'])
 def logout():
     flask_login.logout_user()
+    authorization_manager.user = None
     message = 'Logged out'
     return jsonify(dict(message=message)), 200
 
@@ -115,9 +119,9 @@ def logout():
 @blueprint.route('/roles', methods=['GET'])
 @login_required
 def get_all_user_roles():
-    get_loggedin_user()
     request = ListUserRolesRequest()
     action = ListUserRolesAction(user_roles_repository)
+    action.add_before_execution_hook(authorization_manager.authorize)
     response = action.execute(request)
     status = get_status(response)
 
@@ -170,11 +174,11 @@ def delete_user_role(id):
     return json_response(response.value, UserRoleEncoder, status)
 
 
-@blueprint.route('/role', methods=['PUT'])
+@blueprint.route('/role/<int:id>', methods=['PUT'])
 @login_required
-def update_user_role():
+def update_user_role(id):
     data = http_request.get_json()
-    request = UpdateUserRoleRequest(**data)
+    request = UpdateUserRoleRequest(id, data['name'])
     action = UpdateUserRoleAction(user_roles_repository)
     response = action.execute(request)
     status = get_status(response)
@@ -239,11 +243,11 @@ def delete_task_status(id):
     return json_response(response.value, TaskStatusEncoder, status)
 
 
-@blueprint.route('/status', methods=['PUT'])
+@blueprint.route('/status/<int:id>', methods=['PUT'])
 @login_required
-def update_task_status():
+def update_task_status(id):
     data = http_request.get_json()
-    request = UpdateTaskStatusRequest(**data)
+    request = UpdateTaskStatusRequest(id, data['name'])
     action = UpdateTaskStatusAction(task_statuses_repository)
     response = action.execute(request)
     status = get_status(response)
@@ -382,7 +386,8 @@ def add_task():
 @login_required
 def cancel_task(id):
     request = CancelTaskRequest(id)
-    action = CancelTaskAction(tasks_repository)
+    action = CancelTaskAction(tasks_repository,
+                              status_repo=task_statuses_repository)
     response = action.execute(request)
     status = get_status(response)
 
@@ -393,7 +398,8 @@ def cancel_task(id):
 @login_required
 def complete_task(id):
     request = CompleteTaskRequest(id)
-    action = CompleteTaskAction(tasks_repository)
+    action = CompleteTaskAction(
+        tasks_repository, status_repo=task_statuses_repository)
     response = action.execute(request)
     status = get_status(response)
 

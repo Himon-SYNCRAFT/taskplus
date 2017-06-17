@@ -1,42 +1,102 @@
 import json
-import pytest
-from unittest import mock
+from sqlalchemy import event
+from sqlalchemy.engine import Engine
+from collections import namedtuple
 
-from taskplus.core.shared.response import ResponseSuccess
-from taskplus.core.domain import User, UserRole, Task, TaskStatus, Statuses
-
-
-doer_role = UserRole(name='doer_role', id=2)
-creator_role = UserRole(name='creator_role', id=1)
-creator = User(name='creator', roles=[creator_role], id=1)
-doer = User(name='doer', roles=[doer_role], id=2)
-status_new = TaskStatus(id=Statuses.NEW, name='new')
+from taskplus.core.domain import Statuses
+from taskplus.apps.rest.repositories import UsersRepository
+from taskplus.apps.rest.routes import authorization_manager
+from taskplus.apps.rest.database import Base, db_session, engine
 
 
-@pytest.fixture()
-def task():
-    task = Task(name='example task 1', content='lorem ipsum',
-                status=status_new, creator=creator,
-                doer=doer, id=1)
+users_repository = UsersRepository()
 
-    return task
+User = namedtuple('User', ['id', 'name', 'roles'])
+Role = namedtuple('Role', ['id', 'name'])
+Task = namedtuple('Task', ['id', 'name', 'content', 'status', 'creator', 'doer'])
+Status = namedtuple('Status', ['id', 'name'])
+
+user = User(id=1, name='super', roles=[
+    Role(id=1, name='creator'),
+    Role(id=2, name='doer'),
+    Role(id=3, name='admin'),
+])
+
+user2 = User(id=2, name='user2', roles=[
+    Role(id=1, name='creator'),
+    Role(id=2, name='doer'),
+    Role(id=3, name='admin'),
+])
+
+task = Task(id=1, name='task1', content='lorem ipsum',
+            status=Status(id=1, name='new'), creator=user, doer=user)
 
 
-@pytest.fixture()
-def tasks():
-    task = Task(name='example task 1', content='lorem ipsum',
-                status=status_new, creator=creator,
-                doer=doer, id=1)
-    tasks = [task]
+def setup_function(function):
+    if db_session.bind.driver == 'pysqlite':
+        @event.listens_for(Engine, "connect")
+        def set_sqlite_pragma(dbapi_connection, connection_record):
+            cursor = dbapi_connection.cursor()
+            cursor.execute("PRAGMA foreign_keys=ON")
+            cursor.close()
 
-    return tasks
+    from taskplus.apps.rest import models
+    Base.metadata.reflect(engine)
+    Base.metadata.drop_all(engine)
+    Base.metadata.create_all(engine)
+
+    roles = [models.UserRole(name=role.name, id=role.id) for role in user.roles]
+
+    for role in roles:
+        db_session.add(role)
+
+    db_session.commit()
+
+    db_session.add(models.User(
+        id=user.id,
+        name=user.name,
+        roles=roles,
+        password='super'
+    ))
+
+    db_session.add(models.User(
+        id=user2.id,
+        name=user2.name,
+        roles=roles,
+        password='user2'
+    ))
+
+    db_session.commit()
+
+    status_new = models.TaskStatus(id=Statuses.NEW, name='new')
+    status_in_progress = models.TaskStatus(
+        id=Statuses.IN_PROGRESS, name='in progress')
+    status_completed = models.TaskStatus(
+        id=Statuses.COMPLETED, name='completed')
+    status_canceled = models.TaskStatus(
+        id=Statuses.CANCELED, name='canceled')
+
+    db_session.add(status_new)
+    db_session.add(status_in_progress)
+    db_session.add(status_completed)
+    db_session.add(status_canceled)
+    db_session.commit()
+
+    db_session.add(models.Task(
+        id=task.id,
+        name=task.name,
+        content=task.content,
+        status_id=task.status.id,
+        creator_id=task.creator.id,
+        doer_id=task.doer.id
+    ))
+    db_session.commit()
+
+    user_ = users_repository.one(1)
+    authorization_manager.user = user_
 
 
-@mock.patch('taskplus.apps.rest.routes.ListTasksAction')
-def test_get_tasks_list(mock_action, client, task, tasks):
-    response = ResponseSuccess(tasks)
-    mock_action().execute.return_value = response
-
+def test_get_tasks_list(client):
     http_response = client.get('/tasks')
     doer_roles = [{'id': role.id, 'name': role.name} for role in task.doer.roles]
     creator_roles = [
@@ -65,11 +125,7 @@ def test_get_tasks_list(mock_action, client, task, tasks):
     assert http_response.mimetype == 'application/json'
 
 
-@mock.patch('taskplus.apps.rest.routes.GetNotCompletedTasksAction')
-def test_get_not_completed_tasks(mock_action, client, task, tasks):
-    response = ResponseSuccess(tasks)
-    mock_action().execute.return_value = response
-
+def test_get_not_completed_tasks(client):
     http_response = client.get('/tasks/notcompleted')
     doer_roles = [
         {'id': role.id, 'name': role.name} for role in task.doer.roles]
@@ -99,11 +155,7 @@ def test_get_not_completed_tasks(mock_action, client, task, tasks):
     assert http_response.mimetype == 'application/json'
 
 
-@mock.patch('taskplus.apps.rest.routes.ListTasksAction')
-def test_get_tasks_list_with_filters(mock_action, client, task, tasks):
-    response = ResponseSuccess(tasks)
-    mock_action().execute.return_value = response
-
+def test_get_tasks_list_with_filters(client):
     data = json.dumps(dict(filters=dict(name=task.name)))
     http_response = client.post('/tasks', data=data,
                                 content_type='application/json')
@@ -135,11 +187,7 @@ def test_get_tasks_list_with_filters(mock_action, client, task, tasks):
     assert http_response.mimetype == 'application/json'
 
 
-@mock.patch('taskplus.apps.rest.routes.GetTaskDetailsAction')
-def test_get_task_details(mock_action, client, task, tasks):
-    response = ResponseSuccess(task)
-    mock_action().execute.return_value = response
-
+def test_get_task_details(client):
     http_response = client.get('/task/{}'.format(task.id))
     doer_roles = [
         {'id': role.id, 'name': role.name} for role in task.doer.roles]
@@ -169,32 +217,23 @@ def test_get_task_details(mock_action, client, task, tasks):
     assert http_response.mimetype == 'application/json'
 
 
-@mock.patch('taskplus.apps.rest.routes.AddTaskAction')
-def test_add_task(mock_action, client, task, tasks):
-    response = ResponseSuccess(task)
-    mock_action().execute.return_value = response
-
+def test_add_task(client):
     data = json.dumps(dict(name=task.name, content='lorem ipsum',
-                           creator_id=creator.id))
+                           creator_id=task.creator.id))
     http_response = client.post('/task', data=data,
                                 content_type='application/json')
-    doer_roles = [{'id': role.id, 'name': role.name} for role in task.doer.roles]
     creator_roles = [
         {'id': role.id, 'name': role.name} for role in task.creator.roles]
 
     assert json.loads(http_response.data.decode('UTF-8')) == {
         'name': task.name,
         'content': task.content,
-        'id': task.id,
+        'id': 2,
         'status': {
-            'id': task.status.id,
-            'name': task.status.name,
+            'id': 1,
+            'name': 'new',
         },
-        'doer': {
-            'id': task.doer.id,
-            'name': task.doer.name,
-            'roles': doer_roles
-        },
+        'doer': None,
         'creator': {
             'id': task.creator.id,
             'name': task.creator.name,
@@ -205,11 +244,8 @@ def test_add_task(mock_action, client, task, tasks):
     assert http_response.mimetype == 'application/json'
 
 
-@mock.patch('taskplus.apps.rest.routes.CancelTaskAction')
-def test_cancel_task(mock_action, client, task, tasks):
-    task.status = TaskStatus(id=Statuses.CANCELED, name='canceled')
-    response = ResponseSuccess(task)
-    mock_action().execute.return_value = response
+def test_cancel_task(client):
+    task_status = Status(id=Statuses.CANCELED, name='canceled')
 
     http_response = client.get('/task/{}/cancel'.format(task.id))
     doer_roles = [{'id': role.id, 'name': role.name} for role in task.doer.roles]
@@ -221,8 +257,8 @@ def test_cancel_task(mock_action, client, task, tasks):
         'content': task.content,
         'id': task.id,
         'status': {
-            'id': task.status.id,
-            'name': task.status.name,
+            'id': task_status.id,
+            'name': task_status.name,
         },
         'doer': {
             'id': task.doer.id,
@@ -239,11 +275,8 @@ def test_cancel_task(mock_action, client, task, tasks):
     assert http_response.mimetype == 'application/json'
 
 
-@mock.patch('taskplus.apps.rest.routes.CompleteTaskAction')
-def test_completed_task(mock_action, client, task, tasks):
-    task.status = TaskStatus(id=Statuses.COMPLETED, name='completed')
-    response = ResponseSuccess(task)
-    mock_action().execute.return_value = response
+def test_completed_task(client):
+    task_status = Status(id=Statuses.COMPLETED, name='completed')
 
     http_response = client.get('/task/{}/complete'.format(task.id))
     doer_roles = [{'id': role.id, 'name': role.name} for role in task.doer.roles]
@@ -255,8 +288,8 @@ def test_completed_task(mock_action, client, task, tasks):
         'content': task.content,
         'id': task.id,
         'status': {
-            'id': task.status.id,
-            'name': task.status.name,
+            'id': task_status.id,
+            'name': task_status.name,
         },
         'doer': {
             'id': task.doer.id,
@@ -273,15 +306,13 @@ def test_completed_task(mock_action, client, task, tasks):
     assert http_response.mimetype == 'application/json'
 
 
-@mock.patch('taskplus.apps.rest.routes.AssignUserToTaskAction')
-def test_assign_user_to_task(mock_action, client, task, tasks):
-    task.doer = User(id=3, name='test', roles=[doer_role])
-    response = ResponseSuccess(task)
-    mock_action().execute.return_value = response
+def test_assign_user_to_task(client):
+    task_doer = User(
+        id=user2.id, name=user2.name, roles=[role for role in user2.roles])
 
-    http_response = client.get('/task/{}/assign/{}'.format(task.id,
-                                                           task.doer.id))
-    doer_roles = [{'id': role.id, 'name': role.name} for role in task.doer.roles]
+    http_response = client.get(
+        '/task/{}/assign/{}'.format(task.id, task_doer.id))
+    doer_roles = [{'id': role.id, 'name': role.name} for role in task_doer.roles]
     creator_roles = [
         {'id': role.id, 'name': role.name} for role in task.creator.roles]
 
@@ -294,8 +325,8 @@ def test_assign_user_to_task(mock_action, client, task, tasks):
             'name': task.status.name,
         },
         'doer': {
-            'id': task.doer.id,
-            'name': task.doer.name,
+            'id': task_doer.id,
+            'name': task_doer.name,
             'roles': doer_roles
         },
         'creator': {
@@ -308,12 +339,7 @@ def test_assign_user_to_task(mock_action, client, task, tasks):
     assert http_response.mimetype == 'application/json'
 
 
-@mock.patch('taskplus.apps.rest.routes.UnassignUserFromTaskAction')
-def test_unassign_user_to_task(mock_action, client, task, tasks):
-    task.doer = None
-    response = ResponseSuccess(task)
-    mock_action().execute.return_value = response
-
+def test_unassign_user_to_task(client):
     http_response = client.get('/task/{}/unassign'.format(task.id))
     creator_roles = [
         {'id': role.id, 'name': role.name} for role in task.creator.roles]

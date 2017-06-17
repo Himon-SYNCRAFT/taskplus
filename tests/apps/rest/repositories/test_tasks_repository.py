@@ -275,7 +275,8 @@ def test_tasks_repository_update():
     task.status.id = task_status_id
     task.creator.id = task_creator_id
     task.doer.id = task_doer_id
-    task = repository.update(task)
+    repository.update(task)
+    task = repository.one(1)
 
     assert task.content == task_content
     assert task.status.id == task_status_id

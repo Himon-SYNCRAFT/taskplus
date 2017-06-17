@@ -16,7 +16,7 @@ class CancelTaskAction(Action):
 
         task_id = request.task_id
         task = self.task_repo.one(task_id)
-        task.task_status = status
+        task.status.id = status.id
 
         self._call_before_execution_hooks(request, task)
         response = self.task_repo.update(task)

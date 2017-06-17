@@ -1,7 +1,7 @@
-from taskplus.core.domain.user import User
-from taskplus.core.domain.user_role import UserRole
-from taskplus.core.domain.task_status import TaskStatus
-from taskplus.core.domain.task import Task
+from .user import User
+from .user_role import UserRole
+from .task_status import TaskStatus
+from .task import Task
 
 
 class Statuses(object):
