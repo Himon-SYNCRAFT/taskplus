@@ -29,7 +29,10 @@ user2 = User(id=2, name='user2', roles=[
 ])
 
 task = Task(id=1, name='task1', content='lorem ipsum',
-            status=Status(id=1, name='new'), creator=user, doer=user)
+            status=Status(id=1, name='new'), creator=user, doer=user2)
+
+task2 = Task(id=2, name='task2', content='lorem ipsum',
+             status=Status(id=1, name='new'), creator=user2, doer=user)
 
 
 def setup_function(function):
@@ -90,6 +93,16 @@ def setup_function(function):
         creator_id=task.creator.id,
         doer_id=task.doer.id
     ))
+
+    db_session.add(models.Task(
+        id=task2.id,
+        name=task2.name,
+        content=task2.content,
+        status_id=task2.status.id,
+        creator_id=task2.creator.id,
+        doer_id=task2.doer.id
+    ))
+
     db_session.commit()
 
     user_ = users_repository.one(1)
@@ -102,25 +115,47 @@ def test_get_tasks_list(client):
     creator_roles = [
         {'id': role.id, 'name': role.name} for role in task.creator.roles]
 
-    assert json.loads(http_response.data.decode('UTF-8')) == [{
-        'name': task.name,
-        'content': task.content,
-        'id': task.id,
-        'status': {
-            'id': task.status.id,
-            'name': task.status.name,
+    assert json.loads(http_response.data.decode('UTF-8')) == [
+        {
+            'name': task.name,
+            'content': task.content,
+            'id': task.id,
+            'status': {
+                'id': task.status.id,
+                'name': task.status.name,
+            },
+            'doer': {
+                'id': task.doer.id,
+                'name': task.doer.name,
+                'roles': doer_roles
+            },
+            'creator': {
+                'id': task.creator.id,
+                'name': task.creator.name,
+                'roles': creator_roles
+            },
         },
-        'doer': {
-            'id': task.doer.id,
-            'name': task.doer.name,
-            'roles': doer_roles
-        },
-        'creator': {
-            'id': task.creator.id,
-            'name': task.creator.name,
-            'roles': creator_roles
-        },
-    }]
+        {
+            'name': task2.name,
+            'content': task2.content,
+            'id': task2.id,
+            'status': {
+                'id': task2.status.id,
+                'name': task2.status.name,
+            },
+            'doer': {
+                'id': task2.doer.id,
+                'name': task2.doer.name,
+                'roles': doer_roles
+            },
+            'creator': {
+                'id': task2.creator.id,
+                'name': task2.creator.name,
+                'roles': creator_roles
+            },
+        }
+    ]
+
     assert http_response.status_code == 200
     assert http_response.mimetype == 'application/json'
 
@@ -132,25 +167,46 @@ def test_get_not_completed_tasks(client):
     creator_roles = [
         {'id': role.id, 'name': role.name} for role in task.creator.roles]
 
-    assert json.loads(http_response.data.decode('UTF-8')) == [{
-        'name': task.name,
-        'content': task.content,
-        'id': task.id,
-        'status': {
-            'id': task.status.id,
-            'name': task.status.name,
+    assert json.loads(http_response.data.decode('UTF-8')) == [
+        {
+            'name': task.name,
+            'content': task.content,
+            'id': task.id,
+            'status': {
+                'id': task.status.id,
+                'name': task.status.name,
+            },
+            'doer': {
+                'id': task.doer.id,
+                'name': task.doer.name,
+                'roles': doer_roles
+            },
+            'creator': {
+                'id': task.creator.id,
+                'name': task.creator.name,
+                'roles': creator_roles
+            },
         },
-        'doer': {
-            'id': task.doer.id,
-            'name': task.doer.name,
-            'roles': doer_roles
-        },
-        'creator': {
-            'id': task.creator.id,
-            'name': task.creator.name,
-            'roles': creator_roles
-        },
-    }]
+        {
+            'name': task2.name,
+            'content': task2.content,
+            'id': task2.id,
+            'status': {
+                'id': task2.status.id,
+                'name': task2.status.name,
+            },
+            'doer': {
+                'id': task2.doer.id,
+                'name': task2.doer.name,
+                'roles': doer_roles
+            },
+            'creator': {
+                'id': task2.creator.id,
+                'name': task2.creator.name,
+                'roles': creator_roles
+            },
+        }
+    ]
     assert http_response.status_code == 200
     assert http_response.mimetype == 'application/json'
 
@@ -228,7 +284,7 @@ def test_add_task(client):
     assert json.loads(http_response.data.decode('UTF-8')) == {
         'name': task.name,
         'content': task.content,
-        'id': 2,
+        'id': 3,
         'status': {
             'id': 1,
             'name': 'new',
@@ -308,7 +364,7 @@ def test_completed_task(client):
 
 def test_assign_user_to_task(client):
     task_doer = User(
-        id=user2.id, name=user2.name, roles=[role for role in user2.roles])
+        id=user.id, name=user.name, roles=[role for role in user.roles])
 
     http_response = client.get(
         '/task/{}/assign/{}'.format(task.id, task_doer.id))
@@ -340,22 +396,22 @@ def test_assign_user_to_task(client):
 
 
 def test_unassign_user_to_task(client):
-    http_response = client.get('/task/{}/unassign'.format(task.id))
+    http_response = client.get('/task/{}/unassign'.format(task2.id))
     creator_roles = [
-        {'id': role.id, 'name': role.name} for role in task.creator.roles]
+        {'id': role.id, 'name': role.name} for role in task2.creator.roles]
 
     assert json.loads(http_response.data.decode('UTF-8')) == {
-        'name': task.name,
-        'content': task.content,
-        'id': task.id,
+        'name': task2.name,
+        'content': task2.content,
+        'id': task2.id,
         'status': {
-            'id': task.status.id,
-            'name': task.status.name,
+            'id': task2.status.id,
+            'name': task2.status.name,
         },
         'doer': None,
         'creator': {
-            'id': task.creator.id,
-            'name': task.creator.name,
+            'id': task2.creator.id,
+            'name': task2.creator.name,
             'roles': creator_roles
         },
     }

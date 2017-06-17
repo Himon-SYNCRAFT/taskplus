@@ -45,42 +45,29 @@ class Condition(object):
 
     def is_met(self, user, data):
         operator = self._parse_operator()
-        left = self.left.split('.', maxsplit=1)
-        right = self.right.split('.', maxsplit=1)
-
-        if len(left) == 2:
-            left, left_attribute = left
-        else:
-            left = left[0]
-            left_attribute = None
-
-        if len(right) == 2:
-            right, right_attribute = right
-        else:
-            right = right[0]
-            right_attribute = None
-
-        if left == 'user':
-            left = user
-        elif left.isnumeric():
-            left = int(left)
-        else:
-            left = data[left]
-
-        if right == 'user':
-            right = user
-        elif right.isnumeric():
-            right = int(right)
-        else:
-            right = data[right]
-
-        if left_attribute:
-            left = getattr(left, left_attribute)
-
-        if right_attribute:
-            right = getattr(right, right_attribute)
+        left = self._parse_operand(self.left, user, data)
+        right = self._parse_operand(self.right, user, data)
 
         return operator(left, right)
+
+    def _parse_operand(self, operand, user, data):
+        attributes = operand.split('.')[::-1]
+        attribute = attributes.pop()
+
+        if attribute == 'None':
+            return None
+        elif attribute.isnumeric():
+            return int(attribute)
+        elif attribute == 'user':
+            attribute = user
+        else:
+            attribute = data[attribute]
+
+        while attributes:
+            next_attr = attributes.pop()
+            attribute = getattr(attribute, next_attr)
+
+        return attribute
 
     def _parse_operator(self):
         allowed_operators = ['eq', 'ne']

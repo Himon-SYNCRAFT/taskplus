@@ -94,7 +94,7 @@ class UsersRepository(Repository):
                 permissions.append(Permission('GetRoleDetailsAction'))
                 permissions.append(Permission('GetTaskStatusDetailsAction'))
                 permissions.append(Permission('GetUserDetailsAction', conditions=[
-                    Condition('request.id', 'eq', 'user.id')
+                    Condition('request.user_id', 'eq', 'user.id')
                 ]))
                 permissions.append(Permission('GetNotCompletedTasksAction'))
 
@@ -103,14 +103,14 @@ class UsersRepository(Repository):
                 permissions.append(Permission('CompleteTaskAction'))
                 permissions.append(
                     Permission('AssignUserToTaskAction', conditions=[
-                        Condition('request.id', 'eq', 'user.id')
+                        Condition('request.user_id', 'eq', 'user.id')
                     ]))
                 permissions.append(
                     Permission('UnassignUserFromTaskAction', conditions=[
-                        Condition('request.id', 'eq', 'user.id')
+                        Condition('resource.doer.id', 'eq', 'user.id')
                     ]))
                 permissions.append(Permission('GetUserDetailsAction', conditions=[
-                    Condition('request.id', 'eq', 'user.id')
+                    Condition('request.user_id', 'eq', 'user.id')
                 ]))
                 permissions.append(Permission('GetTaskDetailsAction'))
                 permissions.append(Permission('GetRoleDetailsAction'))
