@@ -138,6 +138,7 @@ class UsersRepository(Repository):
                 permissions.append(Permission('AddTaskStatusAction'))
                 permissions.append(Permission('DeleteTaskStatusAction'))
                 permissions.append(Permission('UpdateTaskStatusAction'))
+                permissions.append(Permission('GetNotCompletedTasksAction'))
 
         return User(
             id=data.id,
