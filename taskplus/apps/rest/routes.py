@@ -55,6 +55,8 @@ def get_status(response):
         if response.type == 'SYSTEM_ERROR':
             if response.message.startswith('NoResultFound'):
                 status = 404
+            elif response.message.startswith('NotAuthorized'):
+                status = 403
             else:
                 status = 500
         elif response.type == 'PARAMETER_ERROR':

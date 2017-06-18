@@ -7,7 +7,8 @@ class AuthorizationManager(object):
 
     def authorize(self, action, data):
         if not self.user or not self.user.permissions:
-            raise NotAuthorized
+            raise NotAuthorized(
+                "You're not authorized to execute requested activity")
 
         permissions = (permission for permission in self.user.permissions
                        if permission.action == action)
@@ -16,7 +17,7 @@ class AuthorizationManager(object):
                for permission in permissions):
             return
 
-        raise NotAuthorized
+        raise NotAuthorized("You're not authorized to execute requested activity")
 
 
 class Permission(object):
