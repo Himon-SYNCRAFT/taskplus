@@ -48,6 +48,12 @@ tasks_repository = TasksRepository()
 authorization_manager = AuthorizationManager()
 
 
+@blueprint.before_request
+def before_request():
+    if current_user and current_user.is_authenticated:
+        authorization_manager.user = current_user
+
+
 def get_status(response):
     status = 200
 
