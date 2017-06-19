@@ -9,6 +9,7 @@ class Config(object):
     PROJECT_ROOT = os.path.abspath(os.path.join(APP_DIR, os.pardir))
     DB_URI = 'sqlite:///data.db'
     SECRET_KEY = os.environ.get('SECRET_KEY')
+    PERMANENT_SESSION_LIFETIME = timedelta(minutes=20)
 
 
 class ProdConfig(Config):

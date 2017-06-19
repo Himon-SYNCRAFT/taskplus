@@ -1,7 +1,7 @@
 import flask_login
 from flask_login import login_required, current_user
 from flask import Blueprint, jsonify
-from flask import request as http_request
+from flask import request as http_request, session
 
 from taskplus.apps.rest.helpers import json_response
 from taskplus.apps.rest.repositories import (UserRolesRepository,
@@ -50,6 +50,9 @@ authorization_manager = AuthorizationManager()
 
 @blueprint.before_request
 def before_request():
+    session.permanent = True
+    session.modified = True
+
     if current_user and current_user.is_authenticated:
         authorization_manager.user = current_user
 
