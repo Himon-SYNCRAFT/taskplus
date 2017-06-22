@@ -337,6 +337,7 @@ def test_update_task(client):
 
 def test_cancel_task(client):
     task_status = Status(id=Statuses.CANCELED, name='canceled')
+    task = task2
 
     http_response = client.get('/task/{}/cancel'.format(task.id))
     doer_roles = [{'id': role.id, 'name': role.name} for role in task.doer.roles]
@@ -368,6 +369,7 @@ def test_cancel_task(client):
 
 def test_completed_task(client):
     task_status = Status(id=Statuses.COMPLETED, name='completed')
+    task = task2
 
     http_response = client.get('/task/{}/complete'.format(task.id))
     doer_roles = [{'id': role.id, 'name': role.name} for role in task.doer.roles]
