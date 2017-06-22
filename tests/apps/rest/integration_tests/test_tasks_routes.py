@@ -2,6 +2,7 @@ import json
 from sqlalchemy import event
 from sqlalchemy.engine import Engine
 from collections import namedtuple
+from unittest import mock
 
 from taskplus.core.domain import Statuses
 from taskplus.apps.rest.repositories import UsersRepository
@@ -300,6 +301,40 @@ def test_add_task(client):
     assert http_response.mimetype == 'application/json'
 
 
+def test_update_task(client):
+    name = 'asdfsdf'
+    content = 'wajrksdfs'
+    data = json.dumps(dict(name=name, content=content))
+    http_response = client.put('/task/{}'.format(task.id), data=data,
+                               content_type='application/json')
+    creator_roles = [
+        {'id': role.id, 'name': role.name} for role in task.creator.roles]
+    doer_roles = [
+        {'id': role.id, 'name': role.name} for role in task.doer.roles]
+
+    assert json.loads(http_response.data.decode('UTF-8')) == {
+        'name': name,
+        'content': content,
+        'id': task.id,
+        'status': {
+            'id': task.status.id,
+            'name': task.status.name,
+        },
+        'doer': {
+            'id': task.doer.id,
+            'name': task.doer.name,
+            'roles': doer_roles
+        },
+        'creator': {
+            'id': task.creator.id,
+            'name': task.creator.name,
+            'roles': creator_roles
+        },
+    }
+    assert http_response.status_code == 200
+    assert http_response.mimetype == 'application/json'
+
+
 def test_cancel_task(client):
     task_status = Status(id=Statuses.CANCELED, name='canceled')
 
@@ -362,12 +397,17 @@ def test_completed_task(client):
     assert http_response.mimetype == 'application/json'
 
 
-def test_assign_user_to_task(client):
+@mock.patch('taskplus.apps.rest.routes.current_user')
+def test_assign_user_to_task(current_user, client):
+    user_ = users_repository.one(1)
+    current_user.id = 1
+    current_user.permissions = user_.permissions
+
     task_doer = User(
         id=user.id, name=user.name, roles=[role for role in user.roles])
 
     http_response = client.get(
-        '/task/{}/assign/{}'.format(task.id, task_doer.id))
+        '/task/{}/assign'.format(task.id, task_doer.id))
     doer_roles = [{'id': role.id, 'name': role.name} for role in task_doer.roles]
     creator_roles = [
         {'id': role.id, 'name': role.name} for role in task.creator.roles]

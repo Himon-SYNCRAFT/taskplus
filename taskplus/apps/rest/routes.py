@@ -32,6 +32,7 @@ from taskplus.core.actions import (
     AssignUserToTaskAction, AssignUserToTaskRequest,
     UnassignUserFromTaskAction, UnassignUserFromTaskRequest,
     AddTaskAction, AddTaskRequest,
+    UpdateTaskAction, UpdateTaskRequest,
 )
 from taskplus.core.authorization import AuthorizationManager
 from taskplus.core.serializers.user_role_serializer import UserRoleEncoder
@@ -415,6 +416,19 @@ def add_task():
     return json_response(response.value, TaskEncoder, status)
 
 
+@blueprint.route('/task/<int:id>', methods=['PUT'])
+@login_required
+def update_task(id):
+    data = http_request.get_json()
+    request = UpdateTaskRequest(id=id, **data)
+    action = UpdateTaskAction(tasks_repository)
+    action.add_before_execution_hook(authorization_manager.authorize)
+    response = action.execute(request)
+    status = get_status(response)
+
+    return json_response(response.value, TaskEncoder, status)
+
+
 @blueprint.route('/task/<int:id>/cancel', methods=['GET'])
 @login_required
 def cancel_task(id):
@@ -441,10 +455,10 @@ def complete_task(id):
     return json_response(response.value, TaskEncoder, status)
 
 
-@blueprint.route('/task/<int:task_id>/assign/<int:user_id>', methods=['GET'])
+@blueprint.route('/task/<int:task_id>/assign', methods=['GET'])
 @login_required
-def assing_user_to_task(task_id, user_id):
-    request = AssignUserToTaskRequest(task_id=task_id, user_id=user_id)
+def assing_user_to_task(task_id):
+    request = AssignUserToTaskRequest(task_id=task_id, user_id=current_user.id)
     action = AssignUserToTaskAction(tasks_repository, users_repository)
     action.add_before_execution_hook(authorization_manager.authorize)
     response = action.execute(request)

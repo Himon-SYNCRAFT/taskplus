@@ -85,7 +85,7 @@ def test_update_task_status_handles_bad_request():
     }
 
 
-def test_update_user_handle_generic_error():
+def test_update_task_status_handle_generic_error():
     repo = mock.Mock()
     error_message = 'Just an error message'
     repo.update.side_effect = Exception(error_message)

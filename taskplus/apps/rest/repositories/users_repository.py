@@ -97,6 +97,10 @@ class UsersRepository(Repository):
                     Condition('request.user_id', 'eq', 'user.id')
                 ]))
                 permissions.append(Permission('GetNotCompletedTasksAction'))
+                permissions.append(
+                    Permission('UpdateTaskAction', conditions=[
+                        Condition('resource.creator.id', 'eq', 'user.id')
+                    ]))
 
             if role.name == 'doer':
                 permissions.append(Permission('CancelTaskAction'))
@@ -139,6 +143,7 @@ class UsersRepository(Repository):
                 permissions.append(Permission('DeleteTaskStatusAction'))
                 permissions.append(Permission('UpdateTaskStatusAction'))
                 permissions.append(Permission('GetNotCompletedTasksAction'))
+                permissions.append(Permission('UpdateTaskAction'))
 
         return User(
             id=data.id,

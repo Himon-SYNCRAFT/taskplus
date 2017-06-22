@@ -21,3 +21,4 @@ from .get_task_status_details import GetTaskStatusDetailsAction, GetTaskStatusDe
 from .delete_task_status import DeleteTaskStatusAction, DeleteTaskStatusRequest
 from .update_task_status import UpdateTaskStatusAction, UpdateTaskStatusRequest
 from .get_not_completed_tasks import GetNotCompletedTasksAction, GetNotCompletedTasksRequest
+from .update_task import UpdateTaskAction, UpdateTaskRequest

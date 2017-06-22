@@ -83,6 +83,10 @@ def create_db():
                         status_id=status_completed.id, creator_id=creator.id,
                         doer_id=doer.id)
 
+    task3 = models.Task(name='example task 3', content='lorem ipsum',
+                        status_id=status_new.id, creator_id=creator.id)
+
     db_session.add(task)
     db_session.add(task2)
+    db_session.add(task3)
     db_session.commit()
