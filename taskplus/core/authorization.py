@@ -46,8 +46,11 @@ class Condition(object):
 
     def is_met(self, user, data):
         operator = self._parse_operator()
-        left = self._parse_operand(self.left, user, data)
-        right = self._parse_operand(self.right, user, data)
+        try:
+            left = self._parse_operand(self.left, user, data)
+            right = self._parse_operand(self.right, user, data)
+        except AttributeError:
+            return False
 
         return operator(left, right)
 

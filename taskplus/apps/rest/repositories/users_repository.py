@@ -103,8 +103,14 @@ class UsersRepository(Repository):
                     ]))
 
             if role.name == 'doer':
-                permissions.append(Permission('CancelTaskAction'))
-                permissions.append(Permission('CompleteTaskAction'))
+                permissions.append(
+                    Permission('CancelTaskAction', conditions=[
+                        Condition('resource.doer.id', 'eq', 'user.id')
+                    ]))
+                permissions.append(
+                    Permission('CompleteTaskAction', conditions=[
+                        Condition('resource.doer.id', 'eq', 'user.id')
+                    ]))
                 permissions.append(
                     Permission('AssignUserToTaskAction', conditions=[
                         Condition('request.user_id', 'eq', 'user.id')
