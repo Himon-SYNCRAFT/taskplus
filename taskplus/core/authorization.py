@@ -5,7 +5,7 @@ from taskplus.core.shared.exceptions import NotAuthorized, InvalidOperatorError
 class AuthorizationManager(object):
     user = None
 
-    def authorize(self, action, data):
+    def authorize(self, action, context):
         if not self.user or not self.user.permissions:
             raise NotAuthorized(
                 "You're not authorized to execute requested activity")
@@ -13,7 +13,7 @@ class AuthorizationManager(object):
         permissions = (permission for permission in self.user.permissions
                        if permission.action == action)
 
-        if any(permission.is_user_permitted(self.user, data)
+        if any(permission.is_user_permitted(self.user, context)
                for permission in permissions):
             return
 
@@ -29,11 +29,11 @@ class Permission(object):
         if conditions is None:
             self.conditions = []
 
-    def is_user_permitted(self, user, data):
+    def is_user_permitted(self, user, context):
         if not self.conditions:
             return True
 
-        return all(condition.is_met(user, data)
+        return all(condition.is_met(user, context)
                    for condition in self.conditions)
 
 
@@ -44,17 +44,17 @@ class Condition(object):
         self.operator = operator
         self.right = right
 
-    def is_met(self, user, data):
+    def is_met(self, user, context):
         operator = self._parse_operator()
         try:
-            left = self._parse_operand(self.left, user, data)
-            right = self._parse_operand(self.right, user, data)
+            left = self._parse_operand(self.left, user, context)
+            right = self._parse_operand(self.right, user, context)
         except AttributeError:
             return False
 
         return operator(left, right)
 
-    def _parse_operand(self, operand, user, data):
+    def _parse_operand(self, operand, user, context):
         attributes = operand.split('.')[::-1]
         attribute = attributes.pop()
 
@@ -65,7 +65,7 @@ class Condition(object):
         elif attribute == 'user':
             attribute = user
         else:
-            attribute = data[attribute]
+            attribute = context[attribute]
 
         while attributes:
             next_attr = attributes.pop()

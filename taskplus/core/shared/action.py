@@ -28,13 +28,13 @@ class Action(object):
     def get_name(cls):
         return cls.__name__
 
-    def _call_before_execution_hooks(self, request, resource):
+    def _call_before_execution_hooks(self, context):
         for func in self._before_execution_hooks:
-            func(self.get_name(), data=dict(request=request, resource=resource))
+            func(self.get_name(), context)
 
-    def _call_after_execution_hooks(self, request, resource):
+    def _call_after_execution_hooks(self, context):
         for func in self._after_execution_hooks:
-            func(self.get_name(), data=dict(request=request, resource=resource))
+            func(self.get_name(), context)
 
     def add_before_execution_hook(self, func):
         self._before_execution_hooks.add(func)

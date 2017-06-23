@@ -10,9 +10,9 @@ class GetUserDetailsAction(Action):
         self.users_repo = users_repo
 
     def process_request(self, request):
-        self._call_before_execution_hooks(request, None)
+        self._call_before_execution_hooks(dict(request=request, user=None))
         user = self.users_repo.one(request.user_id)
-        self._call_after_execution_hooks(request, user)
+        self._call_after_execution_hooks(dict(request=request, user=user))
 
         return ResponseSuccess(user)
 

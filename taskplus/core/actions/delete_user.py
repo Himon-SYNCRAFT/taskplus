@@ -11,10 +11,10 @@ class DeleteUserAction(Action):
 
     def process_request(self, request):
         user_id = request.id
+        self._call_before_execution_hooks(dict(request=request, user=None))
 
-        self._call_before_execution_hooks(request, None)
         response = self.repo.delete(user_id)
-        self._call_after_execution_hooks(request, response)
+        self._call_after_execution_hooks(dict(request=request, user=response))
 
         return ResponseSuccess(response)
 

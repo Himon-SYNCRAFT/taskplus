@@ -13,7 +13,7 @@ class UpdateUserAction(Action):
         user_id = request.id
         user = self.repo.one(user_id)
 
-        self._call_before_execution_hooks(request, user)
+        self._call_before_execution_hooks(dict(request=request, user=user))
 
         if request.name:
             user.name = request.name
@@ -22,7 +22,7 @@ class UpdateUserAction(Action):
             user.role.id = request.role_id
 
         response = self.repo.update(user)
-        self._call_after_execution_hooks(request, response)
+        self._call_after_execution_hooks(dict(request=request, user=response))
 
         return ResponseSuccess(response)
 

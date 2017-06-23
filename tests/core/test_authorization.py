@@ -12,13 +12,13 @@ def test_is_condition_met_returns_true():
     request.id = 2
 
     condition = Condition('user.id', 'eq', '1')
-    assert condition.is_met(user, data=dict(request=request))
+    assert condition.is_met(user, context=dict(request=request))
 
     condition = Condition('user.id', 'ne', '2')
-    assert condition.is_met(user, data=dict(request=request))
+    assert condition.is_met(user, context=dict(request=request))
 
     condition = Condition('user.id', 'ne', 'request.id')
-    assert condition.is_met(user, data=dict(request=request))
+    assert condition.is_met(user, context=dict(request=request))
 
 
 def test_is_condition_met_returns_false():
@@ -28,13 +28,13 @@ def test_is_condition_met_returns_false():
     request.id = 2
 
     condition = Condition('user.id', 'eq', '1')
-    assert not condition.is_met(user, data=dict(request=request))
+    assert not condition.is_met(user, context=dict(request=request))
 
     condition = Condition('user.id', 'ne', '2')
-    assert not condition.is_met(user, data=dict(request=request))
+    assert not condition.is_met(user, context=dict(request=request))
 
     condition = Condition('user.id', 'ne', 'request.id')
-    assert not condition.is_met(user, data=dict(request=request))
+    assert not condition.is_met(user, context=dict(request=request))
 
 
 def test_authorization_manager_raise_not_authorized_without_permissions():
@@ -46,7 +46,8 @@ def test_authorization_manager_raise_not_authorized_without_permissions():
     authorization_manager.user = user
 
     with pytest.raises(NotAuthorized):
-        authorization_manager.authorize(action=action, data=dict(request=request))
+        authorization_manager.authorize(
+            action=action, context=dict(request=request))
 
 
 def test_authorization_manager_with_permission():
@@ -56,7 +57,7 @@ def test_authorization_manager_with_permission():
     user.permissions = [Permission(action)]
     authorization_manager = AuthorizationManager()
     authorization_manager.user = user
-    authorization_manager.authorize(action=action, data=dict(request=request))
+    authorization_manager.authorize(action=action, context=dict(request=request))
 
 
 def test_authorization_manager_permission_with_condition():
@@ -68,7 +69,7 @@ def test_authorization_manager_permission_with_condition():
     user.permissions = [Permission(action, conditions=conditions)]
     authorization_manager = AuthorizationManager()
     authorization_manager.user = user
-    authorization_manager.authorize(action=action, data=dict(request=request))
+    authorization_manager.authorize(action=action, context=dict(request=request))
 
 
 def test_authorization_manager_permission_with_multiple_conditions():
@@ -82,7 +83,7 @@ def test_authorization_manager_permission_with_multiple_conditions():
     user.permissions = [Permission(action, conditions=conditions)]
     authorization_manager = AuthorizationManager()
     authorization_manager.user = user
-    authorization_manager.authorize(action=action, data=dict(request=request))
+    authorization_manager.authorize(action=action, context=dict(request=request))
 
 
 def test_authorization_manager_unmet_condition_raise_not_authorized_exc():
@@ -96,4 +97,5 @@ def test_authorization_manager_unmet_condition_raise_not_authorized_exc():
     authorization_manager.user = user
 
     with pytest.raises(NotAuthorized):
-        authorization_manager.authorize(action=action, data=dict(request=request))
+        authorization_manager.authorize(action=action,
+                                        context=dict(request=request))

@@ -12,9 +12,9 @@ class DeleteUserRoleAction(Action):
     def process_request(self, request):
         user_role_id = request.id
 
-        self._call_before_execution_hooks(request, None)
+        self._call_before_execution_hooks(dict(request=request, role=None))
         role = self.repo.delete(user_role_id)
-        self._call_after_execution_hooks(request, role)
+        self._call_after_execution_hooks(dict(request=request, role=role))
 
         return ResponseSuccess(role)
 

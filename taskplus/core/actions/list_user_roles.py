@@ -11,9 +11,9 @@ class ListUserRolesAction(Action):
         self.repo = repo
 
     def process_request(self, request):
-        self._call_before_execution_hooks(request, None)
+        self._call_before_execution_hooks(dict(request=request, roles=None))
         roles = self.repo.list(filters=request.filters)
-        self._call_after_execution_hooks(request, roles)
+        self._call_after_execution_hooks(dict(request=request, roles=roles))
         return ResponseSuccess(roles)
 
 

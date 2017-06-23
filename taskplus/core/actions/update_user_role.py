@@ -12,13 +12,13 @@ class UpdateUserRoleAction(Action):
     def process_request(self, request):
         role = self.repo.one(id=request.id)
 
-        self._call_before_execution_hooks(request, role)
+        self._call_before_execution_hooks(dict(request=request, role=role))
 
         if request.name:
             role.name = request.name
 
         response = self.repo.update(role)
-        self._call_after_execution_hooks(request, response)
+        self._call_after_execution_hooks(dict(request=request, role=response))
 
         return ResponseSuccess(response)
 

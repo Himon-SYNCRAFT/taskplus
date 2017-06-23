@@ -11,9 +11,9 @@ class ListTaskStatusesAction(Action):
         self.statuses_repo = repo
 
     def process_request(self, request):
-        self._call_before_execution_hooks(request, None)
+        self._call_before_execution_hooks(dict(request=request, statuses=None))
         statuses = self.statuses_repo.list(filters=request.filters)
-        self._call_after_execution_hooks(request, statuses)
+        self._call_after_execution_hooks(dict(request=request, statuses=statuses))
 
         return ResponseSuccess(statuses)
 

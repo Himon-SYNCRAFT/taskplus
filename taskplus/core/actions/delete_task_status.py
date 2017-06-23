@@ -10,10 +10,10 @@ class DeleteTaskStatusAction(Action):
         self.statuses_repo = repo
 
     def process_request(self, request):
-        self._call_before_execution_hooks(request, None)
+        self._call_before_execution_hooks(dict(request=request, status=None))
         status_id = request.id
         status = self.statuses_repo.delete(status_id)
-        self._call_after_execution_hooks(request, status)
+        self._call_after_execution_hooks(dict(request=request, status=status))
 
         return ResponseSuccess(status)
 

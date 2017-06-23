@@ -11,13 +11,13 @@ class UpdateTaskStatusAction(Action):
 
     def process_request(self, request):
         status = self.repo.one(id=request.id)
-        self._call_before_execution_hooks(request, status)
+        self._call_before_execution_hooks(dict(request=request, status=status))
 
         if request.name:
             status.name = request.name
 
         response = self.repo.update(status)
-        self._call_after_execution_hooks(request, response)
+        self._call_after_execution_hooks(dict(request=request, status=response))
 
         return ResponseSuccess(response)
 

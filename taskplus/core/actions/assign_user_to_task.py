@@ -16,11 +16,11 @@ class AssignUserToTaskAction(Action):
 
         user = self.users_repo.one(user_id)
         task = self.tasks_repo.one(task_id)
-        self._call_before_execution_hooks(request, task)
+        self._call_before_execution_hooks(dict(request=request, task=task))
 
         task.doer = user
         response = self.tasks_repo.update(task)
-        self._call_after_execution_hooks(request, task)
+        self._call_after_execution_hooks(dict(request=request, task=response))
 
         return ResponseSuccess(response)
 

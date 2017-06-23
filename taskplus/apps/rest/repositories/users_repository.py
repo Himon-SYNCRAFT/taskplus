@@ -88,7 +88,7 @@ class UsersRepository(Repository):
                 permissions.append(Permission('ListUserRolesAction'))
                 permissions.append(Permission('AddTaskAction'))
                 permissions.append(Permission('CancelTaskAction', conditions=[
-                    Condition('resource.doer', 'eq', 'None')
+                    Condition('task.doer', 'eq', 'None')
                 ]))
                 permissions.append(Permission('GetTaskDetailsAction'))
                 permissions.append(Permission('GetRoleDetailsAction'))
@@ -99,17 +99,17 @@ class UsersRepository(Repository):
                 permissions.append(Permission('GetNotCompletedTasksAction'))
                 permissions.append(
                     Permission('UpdateTaskAction', conditions=[
-                        Condition('resource.creator.id', 'eq', 'user.id')
+                        Condition('task.creator.id', 'eq', 'user.id')
                     ]))
 
             if role.name == 'doer':
                 permissions.append(
                     Permission('CancelTaskAction', conditions=[
-                        Condition('resource.doer.id', 'eq', 'user.id')
+                        Condition('task.doer.id', 'eq', 'user.id')
                     ]))
                 permissions.append(
                     Permission('CompleteTaskAction', conditions=[
-                        Condition('resource.doer.id', 'eq', 'user.id')
+                        Condition('task.doer.id', 'eq', 'user.id')
                     ]))
                 permissions.append(
                     Permission('AssignUserToTaskAction', conditions=[
@@ -117,7 +117,7 @@ class UsersRepository(Repository):
                     ]))
                 permissions.append(
                     Permission('UnassignUserFromTaskAction', conditions=[
-                        Condition('resource.doer.id', 'eq', 'user.id')
+                        Condition('task.doer.id', 'eq', 'user.id')
                     ]))
                 permissions.append(Permission('GetUserDetailsAction', conditions=[
                     Condition('request.user_id', 'eq', 'user.id')

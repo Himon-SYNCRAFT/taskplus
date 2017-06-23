@@ -10,9 +10,9 @@ class GetTaskDetailsAction(Action):
         self.tasks_repo = tasks_repo
 
     def process_request(self, request):
-        self._call_before_execution_hooks(request, None)
+        self._call_before_execution_hooks(dict(request=request, task=None))
         task = self.tasks_repo.one(request.task_id)
-        self._call_after_execution_hooks(request, task)
+        self._call_after_execution_hooks(dict(request=request, task=task))
 
         return ResponseSuccess(task)
 

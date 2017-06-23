@@ -16,9 +16,9 @@ class AddUserAction(Action):
             dict(id__in=request.roles))
         user = User(name=request.name, roles=roles)
 
-        self._call_before_execution_hooks(request, user)
+        self._call_before_execution_hooks(dict(request=request, user=user))
         response = self.users_repo.save(user, password=request.password)
-        self._call_after_execution_hooks(request, response)
+        self._call_after_execution_hooks(dict(request=request, user=response))
 
         return ResponseSuccess(response)
 

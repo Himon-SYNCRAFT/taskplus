@@ -11,12 +11,11 @@ class AddTaskStatusAction(Action):
         self.statuses_repo = statuses_repo
 
     def process_request(self, request):
-        self._call_before_execution_hooks(request, None)
-
         new_status = TaskStatus(name=request.name)
-        response = self.statuses_repo.save(new_status)
+        self._call_before_execution_hooks(dict(request=request, status=new_status))
 
-        self._call_after_execution_hooks(request, response)
+        response = self.statuses_repo.save(new_status)
+        self._call_after_execution_hooks(dict(request=request, status=response))
 
         return ResponseSuccess(response)
 

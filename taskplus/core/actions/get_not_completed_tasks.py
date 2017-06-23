@@ -11,9 +11,9 @@ class GetNotCompletedTasksAction(Action):
         self.task_repo = task_repo
 
     def process_request(self, request):
-        self._call_before_execution_hooks(request, None)
+        self._call_before_execution_hooks(dict(request=request, tasks=None))
         response = self.task_repo.list(filters=request.filters)
-        self._call_after_execution_hooks(request, response)
+        self._call_after_execution_hooks(dict(request=request, tasks=response))
 
         return ResponseSuccess(response)
 

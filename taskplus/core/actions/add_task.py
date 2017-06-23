@@ -21,9 +21,9 @@ class AddTaskAction(Action):
                     status=status,
                     creator=creator)
 
-        self._call_before_execution_hooks(request, task)
+        self._call_before_execution_hooks(dict(request=request, task=task))
         response = self.tasks_repo.save(task)
-        self._call_after_execution_hooks(request, response)
+        self._call_after_execution_hooks(dict(request=request, task=response))
 
         return ResponseSuccess(response)
 

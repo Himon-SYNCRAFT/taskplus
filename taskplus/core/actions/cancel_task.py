@@ -18,9 +18,9 @@ class CancelTaskAction(Action):
         task = self.task_repo.one(task_id)
         task.status.id = status.id
 
-        self._call_before_execution_hooks(request, task)
+        self._call_before_execution_hooks(dict(request=request, task=task))
         response = self.task_repo.update(task)
-        self._call_after_execution_hooks(request, task)
+        self._call_after_execution_hooks(dict(request=request, task=response))
 
         return ResponseSuccess(response)
 

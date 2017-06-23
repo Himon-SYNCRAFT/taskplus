@@ -13,13 +13,15 @@ class CompleteTaskAction(Action):
 
     def process_request(self, request):
         task_id = request.task_id
-        status = self.status_repo.one(Statuses.COMPLETED)
         task = self.task_repo.one(task_id)
-        task.status = status
+        status = self.status_repo.one(Statuses.COMPLETED)
 
-        self._call_before_execution_hooks(request, task)
+        self._call_before_execution_hooks(dict(request=request, task=task))
+
+        task.status = status
         response = self.task_repo.update(task)
-        self._call_after_execution_hooks(request, response)
+
+        self._call_after_execution_hooks(dict(request=request, task=response))
 
         return ResponseSuccess(response)
 

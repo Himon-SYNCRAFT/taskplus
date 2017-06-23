@@ -11,7 +11,7 @@ class UpdateTaskAction(Action):
 
     def process_request(self, request):
         task = self.tasks_repository.one(request.id)
-        self._call_before_execution_hooks(request, task)
+        self._call_before_execution_hooks(dict(request=request, task=task))
 
         if request.name:
             task.name = request.name
@@ -20,7 +20,7 @@ class UpdateTaskAction(Action):
             task.content = request.content
 
         response = self.tasks_repository.update(task)
-        self._call_after_execution_hooks(request, response)
+        self._call_after_execution_hooks(dict(request=request, task=response))
         return ResponseSuccess(response)
 
 

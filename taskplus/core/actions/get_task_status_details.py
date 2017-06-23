@@ -10,9 +10,9 @@ class GetTaskStatusDetailsAction(Action):
         self.statuses_repo = statuses_repo
 
     def process_request(self, request):
-        self._call_before_execution_hooks(request, None)
+        self._call_before_execution_hooks(dict(request=request, status=None))
         status = self.statuses_repo.one(request.status_id)
-        self._call_after_execution_hooks(request, status)
+        self._call_after_execution_hooks(dict(request=request, status=status))
 
         return ResponseSuccess(status)
 
