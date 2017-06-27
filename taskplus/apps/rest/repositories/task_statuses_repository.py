@@ -2,7 +2,9 @@ from taskplus.apps.rest import models
 from taskplus.apps.rest.database import db_session
 from taskplus.core.domain import TaskStatus
 from taskplus.core.shared.repository import Repository
-from taskplus.core.shared.exceptions import NoResultFound
+from taskplus.core.shared.exceptions import (
+    NoResultFound, NotUnique, CannotBeDeleted, DbError)
+from sqlalchemy import exc
 
 
 class TaskStatusesRepository(Repository):
@@ -38,21 +40,45 @@ class TaskStatusesRepository(Repository):
     def update(self, status):
         status_to_update = self.status_model.query.get(status.id)
 
-        if not status:
+        if not status_to_update:
             raise NoResultFound(status.id, TaskStatus.__name__)
 
-        status_to_update.name = status.name
+        try:
+            status_to_update.name = status.name
 
-        self.session.add(status_to_update)
-        self.session.commit()
+            self.session.add(status_to_update)
+            self.session.commit()
+
+        except exc.IntegrityError as e:
+            self.session.rollback()
+
+            if 'unique' in str(e).lower():
+                raise NotUnique('User already exist')
+            raise
+
+        except exc.SQLAlchemyError:
+            self.session.rollback()
+            raise DbError()
 
         return TaskStatus(id=status_to_update.id, name=status_to_update.name)
 
     def save(self, status):
-        new_status = self.status_model(name=status.name)
+        try:
+            new_status = self.status_model(name=status.name)
+            self.session.add(new_status)
+            self.session.commit()
 
-        self.session.add(new_status)
-        self.session.commit()
+        except exc.IntegrityError as e:
+            self.session.rollback()
+
+            if 'unique' in str(e).lower():
+                raise NotUnique('User already exist')
+
+            raise
+
+        except exc.SQLAlchemyError:
+            self.session.rollback()
+            raise DbError()
 
         return TaskStatus(id=new_status.id, name=new_status.name)
 
@@ -62,7 +88,19 @@ class TaskStatusesRepository(Repository):
         if not status:
             raise NoResultFound(id, TaskStatus.__name__)
 
-        self.session.delete(status)
-        self.session.commit()
+        try:
+            self.session.delete(status)
+            self.session.commit()
+
+        except exc.IntegrityError as e:
+            self.session.rollback()
+
+            if 'foreign' in str(e).lower():
+                raise CannotBeDeleted('Cannot delete user')
+            raise
+
+        except exc.SQLAlchemyError:
+            self.session.rollback()
+            raise DbError()
 
         return TaskStatus(id=id, name=status.name)

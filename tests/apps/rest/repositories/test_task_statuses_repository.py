@@ -7,7 +7,8 @@ from taskplus.apps.rest.repositories import TaskStatusesRepository
 from taskplus.core.domain import Statuses
 from taskplus.core.domain import TaskStatus
 from taskplus.core.shared.domain_model import DomainModel
-from taskplus.core.shared.exceptions import NoResultFound
+from taskplus.core.shared.exceptions import (
+    NoResultFound, NotUnique, CannotBeDeleted)
 
 
 repository = TaskStatusesRepository()
@@ -36,6 +37,23 @@ def setup_function(function):
     db_session.add(status_in_progress)
     db_session.add(status_canceled)
     db_session.add(status_completed)
+    db_session.commit()
+
+    creator_role = models.UserRole(name='creator', id=1)
+    db_session.add(creator_role)
+    db_session.commit()
+
+    creator = models.User(name='creator', roles=[creator_role],
+                          id=1, password='pass')
+
+    db_session.add(creator)
+    db_session.commit()
+
+    task = models.Task(name='example task 1', content='lorem ipsum',
+                       status_id=2, creator_id=creator.id,
+                       doer_id=None)
+
+    db_session.add(task)
     db_session.commit()
 
 
@@ -156,12 +174,27 @@ def test_statuses_repository_update():
     assert result.name == name
 
 
+def test_status_repository_non_unique_status():
+    with pytest.raises(NotUnique):
+        repository.update(TaskStatus(id=1, name='in progress'))
+
+
+def test_status_repository_update_not_existing_status():
+    with pytest.raises(NoResultFound):
+        repository.update(TaskStatus(id=9, name='in progress'))
+
+
 def test_statuses_repository_save():
     status_name = 'suspended'
     result = repository.save(TaskStatus(name=status_name))
 
     assert isinstance(result, DomainModel)
     assert result.name == status_name
+
+
+def test_statuses_repository_save_non_unique_status():
+    with pytest.raises(NotUnique):
+        repository.save(TaskStatus(name='in progress'))
 
 
 def test_statuses_repository_delete():
@@ -173,3 +206,13 @@ def test_statuses_repository_delete():
     assert result.id == id
     assert len(statuses) == 3
     assert all([status.id != id and status.name != 'new' for status in statuses])
+
+
+def test_statuses_repository_delete_not_existing_status():
+    with pytest.raises(NoResultFound):
+        repository.delete(9)
+
+
+def test_statuses_repository_delete_status_in_use():
+    with pytest.raises(CannotBeDeleted):
+        repository.delete(2)
