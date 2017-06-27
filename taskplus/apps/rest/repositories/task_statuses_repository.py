@@ -53,7 +53,7 @@ class TaskStatusesRepository(Repository):
             self.session.rollback()
 
             if 'unique' in str(e).lower():
-                raise NotUnique('User already exist')
+                raise NotUnique('Status already exist')
             raise
 
         except exc.SQLAlchemyError:
@@ -72,7 +72,7 @@ class TaskStatusesRepository(Repository):
             self.session.rollback()
 
             if 'unique' in str(e).lower():
-                raise NotUnique('User already exist')
+                raise NotUnique('Status already exist')
 
             raise
 
@@ -96,7 +96,7 @@ class TaskStatusesRepository(Repository):
             self.session.rollback()
 
             if 'foreign' in str(e).lower():
-                raise CannotBeDeleted('Cannot delete user')
+                raise CannotBeDeleted('Cannot delete status')
             raise
 
         except exc.SQLAlchemyError:

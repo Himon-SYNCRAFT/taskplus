@@ -51,7 +51,7 @@ class UserRolesRepository(Repository):
             self.session.rollback()
 
             if 'unique' in str(e).lower():
-                raise NotUnique('User already exist')
+                raise NotUnique('Role already exist')
             raise
 
         except exc.SQLAlchemyError:
@@ -70,7 +70,7 @@ class UserRolesRepository(Repository):
             self.session.rollback()
 
             if 'unique' in str(e).lower():
-                raise NotUnique('User already exist')
+                raise NotUnique('Role already exist')
 
             raise
 
@@ -95,7 +95,7 @@ class UserRolesRepository(Repository):
             self.session.rollback()
 
             if 'foreign' in str(e).lower():
-                raise CannotBeDeleted('Cannot delete user')
+                raise CannotBeDeleted('Cannot delete role')
             raise
 
         except exc.SQLAlchemyError:

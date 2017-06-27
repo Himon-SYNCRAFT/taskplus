@@ -286,6 +286,71 @@ def test_tasks_repository_update():
     assert len(repository.list()) == 2
 
 
+def test_tasks_repository_update_not_existing_task():
+    task = Task(
+        name='task_name',
+        content='task_content',
+        status=TaskStatus(id=1, name='new'),
+        creator=User(id=1, name='creator', roles=[UserRole(id=1, name='creator')]),
+        doer=None,
+        id=9
+    )
+
+    with pytest.raises(NoResultFound):
+        repository.update(task)
+
+
+def test_tasks_repository_update_with_not_existing_status():
+    task_content = 'test content'
+    task_name = 'test name'
+
+    task = Task(
+        name=task_name,
+        content=task_content,
+        status=TaskStatus(id=9, name='new'),
+        creator=User(id=1, name='creator', roles=[UserRole(id=1, name='creator')]),
+        doer=None,
+        id=1
+    )
+
+    with pytest.raises(NoResultFound):
+        repository.update(task)
+
+
+def test_tasks_repository_update_with_not_existing_creator():
+    task_content = 'test content'
+    task_name = 'test name'
+
+    task = Task(
+        name=task_name,
+        content=task_content,
+        status=TaskStatus(id=1, name='new'),
+        creator=User(id=9, name='creator', roles=[UserRole(id=1, name='creator')]),
+        doer=None,
+        id=1
+    )
+
+    with pytest.raises(NoResultFound):
+        repository.update(task)
+
+
+def test_tasks_repository_update_with_not_existing_doer():
+    task_content = 'test content'
+    task_name = 'test name'
+
+    task = Task(
+        name=task_name,
+        content=task_content,
+        status=TaskStatus(id=1, name='new'),
+        creator=User(id=1, name='creator', roles=[UserRole(id=1, name='creator')]),
+        doer=User(id=9, name='creator', roles=[UserRole(id=1, name='creator')]),
+        id=1
+    )
+
+    with pytest.raises(NoResultFound):
+        repository.update(task)
+
+
 def test_tasks_repository_save():
     task_content = 'test content'
     task_name = 'test name'
@@ -309,6 +374,54 @@ def test_tasks_repository_save():
     assert len(repository.list()) == 3
 
 
+def test_tasks_repository_save_with_not_existing_status():
+    task_content = 'test content'
+    task_name = 'test name'
+
+    task = Task(
+        name=task_name,
+        content=task_content,
+        status=TaskStatus(id=9, name='new'),
+        creator=User(id=1, name='creator', roles=[UserRole(id=1, name='creator')]),
+        doer=None,
+    )
+
+    with pytest.raises(NoResultFound):
+        repository.save(task)
+
+
+def test_tasks_repository_save_with_not_existing_creator():
+    task_content = 'test content'
+    task_name = 'test name'
+
+    task = Task(
+        name=task_name,
+        content=task_content,
+        status=TaskStatus(id=1, name='new'),
+        creator=User(id=9, name='creator', roles=[UserRole(id=1, name='creator')]),
+        doer=None,
+    )
+
+    with pytest.raises(NoResultFound):
+        repository.save(task)
+
+
+def test_tasks_repository_save_with_not_existing_doer():
+    task_content = 'test content'
+    task_name = 'test name'
+
+    task = Task(
+        name=task_name,
+        content=task_content,
+        status=TaskStatus(id=1, name='new'),
+        creator=User(id=1, name='creator', roles=[UserRole(id=1, name='creator')]),
+        doer=User(id=9, name='creator', roles=[UserRole(id=1, name='creator')]),
+    )
+
+    with pytest.raises(NoResultFound):
+        repository.save(task)
+
+
 def test_tasks_repository_delete():
     task_id = 1
     result = repository.delete(task_id)
@@ -318,3 +431,8 @@ def test_tasks_repository_delete():
     result = repository.list()
     assert len(result) == 1
     assert all([task.id != task_id for task in result])
+
+
+def test_tasks_repository_delete_not_existng_task():
+    with pytest.raises(NoResultFound):
+        repository.delete(9)
