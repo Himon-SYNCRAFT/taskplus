@@ -19,6 +19,12 @@ user = User(id=1, name='super', roles=[
     Role(id=3, name='admin'),
 ])
 
+user2 = User(id=2, name='abc', roles=[
+    Role(id=1, name='creator'),
+    Role(id=2, name='doer'),
+    Role(id=3, name='admin'),
+])
+
 
 def setup_function(function):
     if db_session.bind.driver == 'pysqlite':
@@ -47,6 +53,13 @@ def setup_function(function):
         password='super'
     ))
 
+    db_session.add(models.User(
+        id=user2.id,
+        name=user2.name,
+        roles=roles,
+        password='asdas'
+    ))
+
     db_session.commit()
 
     user_ = users_repository.one(1)
@@ -58,7 +71,8 @@ def test_get_users_list(client):
     roles = [dict(id=role.id, name=role.name) for role in user.roles]
 
     assert json.loads(http_response.data.decode('UTF-8')) == [
-        {'id': user.id, 'name': user.name, 'roles': roles}
+        {'id': user.id, 'name': user.name, 'roles': roles},
+        {'id': user2.id, 'name': user2.name, 'roles': roles},
     ]
     assert http_response.status_code == 200
     assert http_response.mimetype == 'application/json'
@@ -102,10 +116,28 @@ def test_add_user(client):
 
     assert json.loads(http_response.data.decode('UTF-8')) == {
         'name': name,
-        'id': 2,
+        'id': 3,
         'roles': roles
     }
     assert http_response.status_code == 200
+    assert http_response.mimetype == 'application/json'
+
+
+def test_add_duplicated_user(client):
+    data = json.dumps(dict(
+        name=user.name,
+        roles=[role.id for role in user.roles],
+        password='super')
+    )
+    http_response = client.post('/user', data=data,
+                                content_type='application/json')
+    roles = [{'id': role.id, 'name': role.name} for role in user.roles]
+
+    assert json.loads(http_response.data.decode('UTF-8')) == {
+        'message': 'NotUnique: User already exist',
+        'type': 'SYSTEM_ERROR'
+    }
+    assert http_response.status_code == 400
     assert http_response.mimetype == 'application/json'
 
 
@@ -135,4 +167,19 @@ def test_update_user(client):
         'roles': roles
     }
     assert http_response.status_code == 200
+    assert http_response.mimetype == 'application/json'
+
+
+def test_update_user_duplication(client):
+    data = json.dumps(dict(id=user2.id, name=user.name))
+
+    http_response = client.put('/user', data=data,
+                               content_type='application/json')
+    roles = [{'id': role.id, 'name': role.name} for role in user.roles]
+
+    assert json.loads(http_response.data.decode('UTF-8')) == {
+        'message': 'NotUnique: User already exist',
+        'type': 'SYSTEM_ERROR'
+    }
+    assert http_response.status_code == 400
     assert http_response.mimetype == 'application/json'

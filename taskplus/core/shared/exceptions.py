@@ -15,3 +15,15 @@ class NotAuthorized(Exception):
 
 class InvalidOperatorError(ValueError):
     pass
+
+
+class NotUnique(Exception):
+    pass
+
+
+class DbError(Exception):
+    pass
+
+
+class CannotBeDeleted(Exception):
+    pass

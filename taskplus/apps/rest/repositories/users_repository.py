@@ -2,8 +2,9 @@ from taskplus.apps.rest import models
 from taskplus.apps.rest.database import db_session
 from taskplus.core.domain import User, UserRole
 from taskplus.core.shared.repository import Repository
-from taskplus.core.shared.exceptions import NoResultFound
+from taskplus.core.shared.exceptions import NoResultFound, NotUnique, DbError, CannotBeDeleted
 from taskplus.core.authorization import Permission, Condition
+from sqlalchemy import exc
 
 
 class UsersRepository(Repository):
@@ -42,9 +43,25 @@ class UsersRepository(Repository):
         roles = models.UserRole.query.filter(
             models.UserRole.id.in_([role.id for role in user.roles])).all()
 
-        new_user = self.user_model(name=user.name, roles=roles, password=password)
-        self.session.add(new_user)
-        self.session.commit()
+        if not roles:
+            raise NoResultFound([role.id for role in user.roles], 'UserRole')
+
+        try:
+            new_user = self.user_model(name=user.name, roles=roles, password=password)
+            self.session.add(new_user)
+            self.session.commit()
+
+        except exc.IntegrityError as e:
+            self.session.rollback()
+
+            if 'unique' in str(e).lower():
+                raise NotUnique('User already exist')
+
+            raise
+
+        except exc.SQLAlchemyError:
+            self.session.rollback()
+            raise DbError()
 
         return self._to_domain_model(new_user)
 
@@ -57,11 +74,26 @@ class UsersRepository(Repository):
         roles = models.UserRole.query.filter(
             models.UserRole.id.in_([role.id for role in user.roles])).all()
 
-        user_to_update.name = user.name
-        user_to_update.roles = roles
+        if not roles:
+            raise NoResultFound([role.id for role in user.roles], 'UserRole')
 
-        self.session.add(user_to_update)
-        self.session.commit()
+        try:
+            user_to_update.name = user.name
+            user_to_update.roles = roles
+
+            self.session.add(user_to_update)
+            self.session.commit()
+
+        except exc.IntegrityError as e:
+            self.session.rollback()
+
+            if 'unique' in str(e).lower():
+                raise NotUnique('User already exist')
+            raise
+
+        except exc.SQLAlchemyError:
+            self.session.rollback()
+            raise DbError()
 
         return self._to_domain_model(user_to_update)
 
@@ -73,8 +105,20 @@ class UsersRepository(Repository):
 
         rv = self._to_domain_model(user)
 
-        self.session.delete(user)
-        self.session.commit()
+        try:
+            self.session.delete(user)
+            self.session.commit()
+
+        except exc.IntegrityError as e:
+            self.session.rollback()
+
+            if 'foreign' in str(e).lower():
+                raise CannotBeDeleted('Cannot delete user')
+            raise
+
+        except exc.SQLAlchemyError:
+            self.session.rollback()
+            raise DbError()
 
         return rv
 
@@ -113,7 +157,8 @@ class UsersRepository(Repository):
                     ]))
                 permissions.append(
                     Permission('AssignUserToTaskAction', conditions=[
-                        Condition('request.user_id', 'eq', 'user.id')
+                        Condition('request.user_id', 'eq', 'user.id'),
+                        Condition('task.doer', 'eq', 'None')
                     ]))
                 permissions.append(
                     Permission('UnassignUserFromTaskAction', conditions=[

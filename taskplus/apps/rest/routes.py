@@ -67,6 +67,8 @@ def get_status(response):
                 status = 404
             elif response.message.startswith('NotAuthorized'):
                 status = 403
+            elif response.message.startswith('NotUnique'):
+                status = 400
             else:
                 status = 500
         elif response.type == 'PARAMETER_ERROR':

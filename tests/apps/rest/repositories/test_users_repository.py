@@ -6,9 +6,9 @@ from sqlalchemy.engine import Engine
 
 from taskplus.apps.rest.database import Base, db_session, engine
 from taskplus.apps.rest.repositories import UsersRepository
-from taskplus.core.domain import User, UserRole
+from taskplus.core.domain import User, UserRole, Statuses
 from taskplus.core.shared.domain_model import DomainModel
-from taskplus.core.shared.exceptions import NoResultFound
+from taskplus.core.shared.exceptions import NoResultFound, NotUnique, DbError, CannotBeDeleted
 
 
 user_ = namedtuple('user_', ['id', 'name', 'role_id', 'role_name'])
@@ -50,6 +50,16 @@ def setup_function(function):
         db_session.add(doer)
         db_session.commit()
 
+        status_new = models.TaskStatus(id=Statuses.NEW, name='new')
+        db_session.add(status_new)
+        db_session.commit()
+
+        task = models.Task(name='example task 1', content='lorem ipsum',
+                           status_id=status_new.id, creator_id=doer_.id,
+                           doer_id=doer_.id)
+
+        db_session.add(task)
+        db_session.commit()
 
 def test_users_repository_one():
     id, name, role_id, role_name = creator_
@@ -105,6 +115,28 @@ def test_users_repository_save():
     assert isinstance(result, DomainModel)
 
 
+def test_add_non_unique_user():
+    creator_id, creator_name, creator_role_id, creator_role_name = creator_
+
+    user = User(
+        name=creator_name,
+        roles=[UserRole(name=creator_role_name, id=creator_role_id)],
+    )
+
+    with pytest.raises(NotUnique):
+        repository.save(user, password='pass')
+
+
+def test_add_user_with_not_existing_role():
+    user = User(
+        name='asdasdasd',
+        roles=[UserRole(name='asdasd', id=99)],
+    )
+
+    with pytest.raises(NoResultFound):
+        repository.save(user, password='pass')
+
+
 def test_users_repository_update():
     creator_id, creator_name, creator_role_id, creator_role_name = creator_
 
@@ -121,6 +153,64 @@ def test_users_repository_update():
     assert result.roles[0].name == user.roles[0].name
     assert not hasattr(result, 'password')
     assert isinstance(result, DomainModel)
+
+
+def test_update_non_unique_user():
+    creator_id, creator_name, creator_role_id, creator_role_name = creator_
+    doer_id, doer_name, doer_role_id, doer_role_name = doer_
+
+    user = User(
+        name=creator_name,
+        roles=[UserRole(name=creator_role_name, id=creator_role_id)],
+        id=doer_id
+    )
+
+    with pytest.raises(NotUnique):
+        repository.update(user)
+
+def test_update_not_existing_user():
+    creator_id, creator_name, creator_role_id, creator_role_name = creator_
+    user = User(
+        name='asdasd',
+        roles=[UserRole(name=creator_role_name, id=creator_role_id)],
+        id=99
+    )
+
+    with pytest.raises(NoResultFound):
+        repository.update(user)
+
+
+def test_update_user_with_not_existing_role():
+    user = User(
+        name='asdasdasd',
+        roles=[UserRole(name='asdasd', id=99)],
+        id=1
+    )
+
+    with pytest.raises(NoResultFound):
+        repository.update(user)
+
+def test_users_repository_delete():
+    user_id = 1
+
+    result = repository.delete(user_id)
+    assert result.id == user_id
+    assert not hasattr(result, 'password')
+
+    result = repository.list()
+    assert len(result) == 1
+    assert all([user.id != user_id for user in result])
+
+
+def test_users_repository_delete_not_existing_user():
+    user_id = 99
+    with pytest.raises(NoResultFound):
+        repository.delete(user_id)
+
+
+def test_users_repository_delete_user_with_tasks():
+    with pytest.raises(CannotBeDeleted):
+        repository.delete(doer_.id)
 
 
 def test_users_repository_with_filter_gt():
@@ -192,15 +282,3 @@ def test_users_repository_with_filter_le():
 
     assert any([user.id == 1 for user in result])
     assert len(result) == 1
-
-
-def test_users_repository_delete():
-    user_id = 1
-
-    result = repository.delete(user_id)
-    assert result.id == user_id
-    assert not hasattr(result, 'password')
-
-    result = repository.list()
-    assert len(result) == 1
-    assert all([user.id != user_id for user in result])

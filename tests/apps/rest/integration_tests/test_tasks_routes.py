@@ -35,6 +35,9 @@ task = Task(id=1, name='task1', content='lorem ipsum',
 task2 = Task(id=2, name='task2', content='lorem ipsum',
              status=Status(id=1, name='new'), creator=user2, doer=user)
 
+task3 = Task(id=3, name='task3', content='lorem ipsum',
+             status=Status(id=1, name='new'), creator=user2, doer=None)
+
 
 def setup_function(function):
     if db_session.bind.driver == 'pysqlite':
@@ -104,6 +107,14 @@ def setup_function(function):
         doer_id=task2.doer.id
     ))
 
+    db_session.add(models.Task(
+        id=task3.id,
+        name=task3.name,
+        content=task3.content,
+        status_id=task3.status.id,
+        creator_id=task3.creator.id,
+    ))
+
     db_session.commit()
 
     user_ = users_repository.one(1)
@@ -152,6 +163,21 @@ def test_get_tasks_list(client):
             'creator': {
                 'id': task2.creator.id,
                 'name': task2.creator.name,
+                'roles': creator_roles
+            },
+        },
+        {
+            'name': task3.name,
+            'content': task3.content,
+            'id': task3.id,
+            'status': {
+                'id': task3.status.id,
+                'name': task3.status.name,
+            },
+            'doer': None,
+            'creator': {
+                'id': task3.creator.id,
+                'name': task3.creator.name,
                 'roles': creator_roles
             },
         }
@@ -204,6 +230,21 @@ def test_get_not_completed_tasks(client):
             'creator': {
                 'id': task2.creator.id,
                 'name': task2.creator.name,
+                'roles': creator_roles
+            },
+        },
+        {
+            'name': task3.name,
+            'content': task3.content,
+            'id': task3.id,
+            'status': {
+                'id': task3.status.id,
+                'name': task3.status.name,
+            },
+            'doer': None,
+            'creator': {
+                'id': task3.creator.id,
+                'name': task3.creator.name,
                 'roles': creator_roles
             },
         }
@@ -285,7 +326,7 @@ def test_add_task(client):
     assert json.loads(http_response.data.decode('UTF-8')) == {
         'name': task.name,
         'content': task.content,
-        'id': 3,
+        'id': 4,
         'status': {
             'id': 1,
             'name': 'new',
@@ -409,18 +450,18 @@ def test_assign_user_to_task(current_user, client):
         id=user.id, name=user.name, roles=[role for role in user.roles])
 
     http_response = client.get(
-        '/task/{}/assign'.format(task.id, task_doer.id))
+        '/task/{}/assign'.format(task3.id, task_doer.id))
     doer_roles = [{'id': role.id, 'name': role.name} for role in task_doer.roles]
     creator_roles = [
         {'id': role.id, 'name': role.name} for role in task.creator.roles]
 
     assert json.loads(http_response.data.decode('UTF-8')) == {
-        'name': task.name,
-        'content': task.content,
-        'id': task.id,
+        'name': task3.name,
+        'content': task3.content,
+        'id': task3.id,
         'status': {
-            'id': task.status.id,
-            'name': task.status.name,
+            'id': task3.status.id,
+            'name': task3.status.name,
         },
         'doer': {
             'id': task_doer.id,
@@ -428,8 +469,8 @@ def test_assign_user_to_task(current_user, client):
             'roles': doer_roles
         },
         'creator': {
-            'id': task.creator.id,
-            'name': task.creator.name,
+            'id': task3.creator.id,
+            'name': task3.creator.name,
             'roles': creator_roles
         },
     }
