@@ -6,7 +6,8 @@ from taskplus.apps.rest.database import Base, db_session, engine
 from taskplus.apps.rest.repositories import UserRolesRepository
 from taskplus.core.domain import UserRole
 from taskplus.core.shared.domain_model import DomainModel
-from taskplus.core.shared.exceptions import NoResultFound
+from taskplus.core.shared.exceptions import (
+    NoResultFound, NotUnique, CannotBeDeleted)
 
 
 repository = UserRolesRepository()
@@ -30,6 +31,11 @@ def setup_function(function):
 
     db_session.add(creator_role)
     db_session.add(doer_role)
+    db_session.commit()
+
+    creator = models.User(name='creator', roles=[doer_role],
+                          id=1, password='pass')
+    db_session.add(creator)
     db_session.commit()
 
 
@@ -73,6 +79,16 @@ def test_user_roles_repository_update():
     assert len(result) == 2
 
 
+def test_user_roles_repository_update_not_unique_role():
+    with pytest.raises(NotUnique):
+        repository.update(UserRole(id=1, name='doer_role'))
+
+
+def test_status_repository_update_not_existing_status():
+    with pytest.raises(NoResultFound):
+        repository.update(UserRole(id=9, name='asdas'))
+
+
 def test_user_roles_repository_save():
     role_name = 'test'
     role = UserRole(name=role_name)
@@ -86,6 +102,11 @@ def test_user_roles_repository_save():
     result = repository.list()
 
     assert len(result) == 3
+
+
+def test_user_roles_repository_save_not_unique_role():
+    with pytest.raises(NotUnique):
+        repository.save(UserRole(name='creator_role'))
 
 
 def test_roles_repository_with_filter_gt():
@@ -169,3 +190,13 @@ def test_roles_repository_delete():
     result = repository.list()
     assert all([role.id != role_id for role in result])
     assert len(result) == 1
+
+
+def test_roles_repository_delete_not_existing_role():
+    with pytest.raises(NoResultFound):
+        repository.delete(9)
+
+
+def test_statuses_repository_delete_status_in_use():
+    with pytest.raises(CannotBeDeleted):
+        repository.delete(2)

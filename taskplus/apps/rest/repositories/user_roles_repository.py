@@ -2,7 +2,9 @@ from taskplus.apps.rest import models
 from taskplus.apps.rest.database import db_session
 from taskplus.core.domain import UserRole
 from taskplus.core.shared.repository import Repository
-from taskplus.core.shared.exceptions import NoResultFound
+from taskplus.core.shared.exceptions import (
+    NoResultFound, NotUnique, DbError, CannotBeDeleted)
+from sqlalchemy import exc
 
 
 class UserRolesRepository(Repository):
@@ -40,17 +42,41 @@ class UserRolesRepository(Repository):
         if not role_to_update:
             raise NoResultFound(role.id, UserRole.__name__)
 
-        role_to_update.name = role.name
+        try:
+            role_to_update.name = role.name
+            self.session.add(role_to_update)
+            self.session.commit()
 
-        self.session.add(role_to_update)
-        self.session.commit()
+        except exc.IntegrityError as e:
+            self.session.rollback()
+
+            if 'unique' in str(e).lower():
+                raise NotUnique('User already exist')
+            raise
+
+        except exc.SQLAlchemyError:
+            self.session.rollback()
+            raise DbError()
 
         return UserRole(id=role_to_update.id, name=role_to_update.name)
 
     def save(self, role):
-        new_role = self.role_model(name=role.name)
-        self.session.add(new_role)
-        self.session.commit()
+        try:
+            new_role = self.role_model(name=role.name)
+            self.session.add(new_role)
+            self.session.commit()
+
+        except exc.IntegrityError as e:
+            self.session.rollback()
+
+            if 'unique' in str(e).lower():
+                raise NotUnique('User already exist')
+
+            raise
+
+        except exc.SQLAlchemyError:
+            self.session.rollback()
+            raise DbError()
 
         return UserRole(id=new_role.id, name=new_role.name)
 
@@ -60,9 +86,20 @@ class UserRolesRepository(Repository):
         if not role_to_delete:
             raise NoResultFound(id, UserRole.__name__)
 
-        role = UserRole(id=role_to_delete.id, name=role_to_delete.name)
+        try:
+            role = UserRole(id=role_to_delete.id, name=role_to_delete.name)
+            self.session.delete(role_to_delete)
+            self.session.commit()
 
-        self.session.delete(role_to_delete)
-        self.session.commit()
+        except exc.IntegrityError as e:
+            self.session.rollback()
+
+            if 'foreign' in str(e).lower():
+                raise CannotBeDeleted('Cannot delete user')
+            raise
+
+        except exc.SQLAlchemyError:
+            self.session.rollback()
+            raise DbError()
 
         return role
